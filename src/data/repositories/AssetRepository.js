@@ -2,9 +2,11 @@
  * AssetRepository - Data Layer
  * 資産データアクセスの抽象化とCRUD操作
  * 資産データを管理するためのメソッドが格納されたクラス。資産の取得、追加削除ができる。
+ * 内部永続化は DataStoreManager に委譲する（外部APIは変更なし）。
  */
 
 import { AssetEntity } from '../../business/models/AssetEntity.js';
+import { DataStoreManager } from '../managers/DataStoreManager.js';
 
 export class AssetRepository {
     /**
@@ -14,9 +16,16 @@ export class AssetRepository {
      * @param {Function} storageAdapter.save - データを保存するメソッド
      */
     constructor(storageAdapter) {
-        this.storage = storageAdapter;
-        this.storageKey = 'investment-assets';
-        this.indexKey = 'investment-assets-index';
+        // 旧: 直接Adapterを使用 → 新: DataStoreManagerへ委譲
+        this.storage = storageAdapter; // 後方互換のため保持（直接は使わない）
+        this.store = new DataStoreManager(storageAdapter, {
+            namespacePrefix: 'investment-',
+            versionKey: 'investment-version',
+            currentVersion: 1,
+            debug: true
+        });
+        this.storageKey = DataStoreManager.DEFAULT_KEYS.ASSETS;
+        this.indexKey = DataStoreManager.DEFAULT_KEYS.INDEX;
         this.debugMode = true;
     }
 
@@ -39,7 +48,7 @@ export class AssetRepository {
      */
     async getAllAssets() {
         try {
-            const assetsData = this.storage.load(this.storageKey);
+            const assetsData = this.store.load(this.storageKey);
             if (!assetsData) {
                 this.debugLog('資産データが存在しません - 空配列を返します');
                 return [];
@@ -130,7 +139,7 @@ export class AssetRepository {
             allAssets.push(asset);
             
             // 保存
-            if (!this.storage.save(this.storageKey, allAssets.map(a => a.toJSON()))) {
+            if (!this.store.save(this.storageKey, allAssets.map(a => a.toJSON()))) {
                 throw new Error('データの保存に失敗しました');
             }
 
@@ -233,7 +242,7 @@ export class AssetRepository {
             }
 
             // 保存
-            if (!this.storage.save(this.storageKey, filteredAssets.map(a => a.toJSON()))) {
+            if (!this.store.save(this.storageKey, filteredAssets.map(a => a.toJSON()))) {
                 throw new Error('データの保存に失敗しました');
             }
 
@@ -425,7 +434,7 @@ export class AssetRepository {
                 }
             });
 
-            this.storage.save(this.indexKey, index);
+            this.store.save(this.indexKey, index);
             this.debugLog('インデックス更新完了');
         } catch (error) {
             this.debugLog('インデックス更新エラー:', error);
@@ -440,11 +449,11 @@ export class AssetRepository {
      */
     async initializeDatabase() {
         try {
-            const existingData = this.storage.load(this.storageKey);
+            const existingData = this.store.load(this.storageKey);
             if (!existingData) {
                 // サンプルデータを作成
                 const sampleAssets = this.createSampleAssets();
-                this.storage.save(this.storageKey, sampleAssets.map(a => a.toJSON()));
+                this.store.save(this.storageKey, sampleAssets.map(a => a.toJSON()));
                 await this.updateIndex();
                 this.debugLog('データベース初期化完了（サンプルデータあり）');
             } else {

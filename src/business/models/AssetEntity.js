@@ -322,6 +322,64 @@ export class AssetEntity {
     }
 
     // ========================================
+    // 互換API（薄い委譲ではなく簡易実装）
+    // ========================================
+
+    /**
+     * 評価損益（currentValue - totalInvestment）
+     * @returns {number}
+     */
+    getUnrealizedGainLoss() {
+        return (this.currentValue || 0) - (this.totalInvestment || 0);
+    }
+
+    /**
+     * 利益率%（totalInvestmentが0の場合は0）
+     * @returns {number}
+     */
+    getReturnPercentage() {
+        const ti = this.totalInvestment || 0;
+        if (ti === 0) return 0;
+        return ((this.currentValue || 0) - ti) / ti * 100;
+    }
+
+    /**
+     * サマリー（互換用）
+     * @returns {{
+     *   id: string,
+     *   name: string,
+     *   type: string,
+     *   region: string,
+     *   totalInvestment: number,
+     *   currentValue: number,
+     *   unrealizedGainLoss: number,
+     *   returnPercentage: number,
+     *   isProfit: boolean,
+     *   sector: string|null,
+     *   createdAt: string,
+     *   updatedAt: string
+     * }}
+     */
+    getSummary() {
+        const gain = this.getUnrealizedGainLoss();
+        const ret = this.getReturnPercentage();
+        return {
+            id: this.id,
+            name: this.name,
+            type: this.type,
+            region: this.region,
+            totalInvestment: this.totalInvestment,
+            currentValue: this.currentValue,
+            unrealizedGainLoss: gain,
+            returnPercentage: ret,
+            isProfit: gain >= 0,
+            sector: this.sector,
+            createdAt: this.createdAt,
+            updatedAt: this.updatedAt
+        };
+    }
+
+    // ========================================
     // フォーム専用静的メソッド（Business Layer強化）
     // ========================================
 

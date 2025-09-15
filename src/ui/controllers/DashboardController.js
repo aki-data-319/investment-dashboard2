@@ -2,6 +2,7 @@ import { DashboardView } from '../views/DashboardView.js';
 import { AssetRepository } from '../../data/repositories/AssetRepository.js';
 import { LocalStorageAdapter } from '../../infrastructure/LocalStorageAdapter.js';
 import { AssetFormController } from './AssetFormController.js';
+import { DataStoreManager } from '../../data/managers/DataStoreManager.js';
 
 /**
  * DashboardController - ダッシュボード画面の制御を担当
@@ -23,10 +24,13 @@ class DashboardController {
         const storageAdapter = new LocalStorageAdapter();
         this.assetRepository = new AssetRepository(storageAdapter);
         
+        // DataStoreManagerの初期化（DatabaseController用）
+        this.dataStoreManager = new DataStoreManager(storageAdapter);
+        
         // フォームコントローラー初期化
         this.assetFormController = new AssetFormController(this.assetRepository, this);
         
-        console.log('🎮 DashboardController initialized with data layers and form controller');
+        console.log('🎮 DashboardController initialized with data layers, DataStoreManager, and form controller');
     }
 
     /**

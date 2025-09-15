@@ -1,0 +1,1935 @@
+/**
+ * データベースページ専用スタイル（基盤版）
+ * @description モダンなデータベースUI・レスポンシブ対応
+ */
+
+/* ======================
+   データベースページ基盤
+   ====================== */
+.database-page {
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.database-header {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 2rem;
+    border-left: 4px solid #007bff;
+}
+
+.database-header h1 {
+    margin: 0 0 1.5rem 0;
+    color: #2c3e50;
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.navigation-actions {
+    margin-bottom: 1rem;
+}
+
+.btn-back {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-back:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+}
+
+/* ======================
+   タブナビゲーション
+   ====================== */
+.database-tabs {
+    display: flex;
+    gap: 0.5rem;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #6c757d;
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.tab-btn:hover {
+    background-color: #f8f9fa;
+    color: #495057;
+}
+
+.tab-btn.active {
+    background-color: #007bff;
+    color: white;
+    box-shadow: 0 -2px 8px rgba(0,123,255,0.2);
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #007bff;
+}
+
+/* ======================
+   タブコンテンツ
+   ====================== */
+.database-content {
+    background: white;
+    border-radius: 0 12px 12px 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.tab-content {
+    display: none;
+    padding: 2rem;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ======================
+   プレースホルダー・ローディング
+   ====================== */
+.tab-placeholder {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #6c757d;
+}
+
+.loading-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e9ecef;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.error-state {
+    color: #dc3545;
+}
+
+.error-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.error-message {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.btn-retry {
+    background: #17a2b8;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-retry:hover {
+    background: #138496;
+    transform: translateY(-1px);
+}
+
+/* ======================
+   暫定コンテンツ表示
+   ====================== */
+.temp-content {
+    padding: 1rem;
+}
+
+.content-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.content-header h3 {
+    color: #2c3e50;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.status-info {
+    color: #28a745;
+    font-weight: 500;
+    background: #d4edda;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+.feature-preview {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.feature-preview h4 {
+    color: #495057;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+}
+
+.feature-list li {
+    padding: 0.5rem 0;
+    color: #28a745;
+    font-weight: 500;
+}
+
+/* ======================
+   モックテーブル
+   ====================== */
+.mock-table {
+    margin-top: 1.5rem;
+}
+
+.preview-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.preview-table thead {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+}
+
+.preview-table th {
+    padding: 1rem 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.preview-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.type-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-align: center;
+    min-width: 70px;
+}
+
+.type-mutualfund { background: #d4edda; color: #155724; }
+.type-stock { background: #cce5ff; color: #0056b3; }
+.type-crypto { background: #fff3cd; color: #856404; }
+
+.region-badge {
+    display: inline-block;
+    padding: 0.2rem 0.4rem;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.region-jp { background: #ffe6e6; color: #d63384; }
+.region-us { background: #e6f3ff; color: #0066cc; }
+.region-global { background: #f0f0f0; color: #666; }
+
+.btn-action {
+    background: #17a2b8;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-action:hover {
+    background: #138496;
+    transform: scale(1.05);
+}
+
+/* ======================
+   モックグリッド
+   ====================== */
+.mock-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.asset-card-preview {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+.asset-card-preview::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(45deg, #007bff, #28a745);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.card-header h4 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.ticker {
+    background: #e9ecef;
+    color: #495057;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    font-family: 'Courier New', monospace;
+}
+
+.card-metrics {
+    margin-bottom: 1rem;
+}
+
+.metric {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.metric label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.metric span {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #28a745;
+}
+
+.card-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* ======================
+   履歴表示
+   ====================== */
+.history-preview {
+    background: #f8f9fa;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+    background: white;
+    margin-bottom: 1px;
+}
+
+.history-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.history-time {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: 500;
+    min-width: 120px;
+}
+
+.history-action {
+    font-weight: 600;
+    color: #007bff;
+    min-width: 100px;
+    text-align: center;
+}
+
+.history-detail {
+    flex: 1;
+    margin-left: 1rem;
+    color: #495057;
+}
+
+/* ======================
+   レスポンシブデザイン
+   ====================== */
+
+/* タブレット (768px 以下) */
+@media (max-width: 768px) {
+    .database-page {
+        padding: 1rem;
+    }
+    
+    .database-header {
+        padding: 1.5rem;
+    }
+    
+    .database-tabs {
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    .tab-btn {
+        flex-shrink: 0;
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .tab-content {
+        padding: 1.5rem;
+    }
+    
+    .mock-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .history-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .history-time,
+    .history-action {
+        min-width: auto;
+    }
+    
+    .history-detail {
+        margin-left: 0;
+    }
+}
+
+/* モバイル (480px 以下) */
+@media (max-width: 480px) {
+    .database-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .tab-btn {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.8rem;
+    }
+    
+    .asset-card-preview {
+        padding: 1rem;
+    }
+    
+    .preview-table {
+        font-size: 0.8rem;
+    }
+    
+    .preview-table th,
+    .preview-table td {
+        padding: 0.5rem 0.4rem;
+    }
+}
+
+/* ダークモード対応準備 */
+@media (prefers-color-scheme: dark) {
+    .database-page {
+        background-color: #1a1d23;
+        color: #e9ecef;
+    }
+    
+    .database-header,
+    .database-content,
+    .asset-card-preview {
+        background: #2d3748;
+        border-color: #4a5568;
+    }
+    
+    .database-header h1 {
+        color: #e2e8f0;
+    }
+    
+    .feature-preview {
+        background: #374151;
+        border-color: #4b5563;
+    }
+    
+    .preview-table {
+        background: #2d3748;
+        color: #e2e8f0;
+    }
+    
+    .preview-table thead {
+        background: linear-gradient(135deg, #4c51bf, #553c9a);
+    }
+}
+
+/* ======================
+   取引履歴テーブル専用スタイル
+   ====================== */
+.database-section-header {
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.database-section-header h3 {
+    color: #2c3e50;
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.section-description {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* データベースコントロール */
+.database-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8f9fa;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border: 1px solid #dee2e6;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.control-group label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #495057;
+}
+
+.control-group select {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    background: white;
+}
+
+.control-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn-export,
+.btn-refresh {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-export:hover,
+.btn-refresh:hover {
+    background: #218838;
+    transform: translateY(-1px);
+}
+
+.btn-refresh {
+    background: #17a2b8;
+}
+
+.btn-refresh:hover {
+    background: #138496;
+}
+
+/* 統計情報カード */
+.transaction-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.25rem;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+/* 高度テーブル */
+.transaction-table-wrapper {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border: 1px solid #e9ecef;
+}
+
+.transaction-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.transaction-table thead {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+}
+
+.transaction-table th {
+    padding: 1rem 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.transaction-table th.sortable {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.transaction-table th.sortable:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.sort-indicator {
+    opacity: 0.6;
+    margin-left: 0.5rem;
+}
+
+.transaction-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #f1f3f4;
+    vertical-align: middle;
+}
+
+.transaction-row {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.transaction-row:hover {
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.transaction-row.selected {
+    background-color: #e3f2fd;
+    border-left: 4px solid #2196F3;
+}
+
+.date-cell {
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    color: #495057;
+}
+
+.asset-name {
+    max-width: 200px;
+}
+
+.name-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.primary-name {
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 0.2rem;
+}
+
+.sector-info {
+    font-size: 0.75rem;
+    color: #6c757d;
+    background: #f8f9fa;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+.quantity,
+.unit-price,
+.amount {
+    text-align: right;
+    font-weight: 500;
+    font-family: 'Courier New', monospace;
+}
+
+.amount {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.25rem;
+    justify-content: center;
+}
+
+.btn-action {
+    background: #17a2b8;
+    color: white;
+    border: none;
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-action:hover {
+    background: #138496;
+    transform: scale(1.05);
+}
+
+.no-data {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+    font-style: italic;
+    background: #f8f9fa;
+}
+
+/* テーブル情報フッター */
+.table-info {
+    background: #f8f9fa;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.info-text {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.btn-show-more {
+    background: #ffc107;
+    color: #212529;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-show-more:hover {
+    background: #e0a800;
+    transform: translateY(-1px);
+}
+
+/* 通知スタイル */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 6px;
+    color: white;
+    font-weight: 500;
+    z-index: 10000;
+    animation: slideInRight 0.3s ease-out;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.notification-success {
+    background: #28a745;
+}
+
+.notification-error {
+    background: #dc3545;
+}
+
+.notification-info {
+    background: #17a2b8;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* レスポンシブ対応（取引テーブル用） */
+@media (max-width: 1024px) {
+    .transaction-table {
+        font-size: 0.8rem;
+    }
+    
+    .transaction-table th,
+    .transaction-table td {
+        padding: 0.6rem 0.5rem;
+    }
+    
+    .asset-name {
+        max-width: 150px;
+    }
+    
+    .primary-name {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .database-controls {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+    
+    .control-actions {
+        justify-content: center;
+    }
+    
+    .transaction-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .transaction-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .transaction-table {
+        min-width: 800px;
+    }
+    
+    .table-info {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .transaction-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+    }
+    
+    .stat-value {
+        font-size: 1.2rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.15rem;
+    }
+    
+    .btn-action {
+        padding: 0.25rem;
+        font-size: 0.7rem;
+    }
+}
+
+/* ======================
+   銘柄情報グリッド専用スタイル
+   ====================== */
+.asset-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8f9fa;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border: 1px solid #dee2e6;
+}
+
+.btn-sort-direction {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.6rem;
+    border-radius: 4px;
+    margin-left: 0.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.btn-sort-direction:hover {
+    background: #5a6268;
+}
+
+.btn-analyze {
+    background: #6610f2;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-analyze:hover {
+    background: #520dc2;
+    transform: translateY(-1px);
+}
+
+/* 銘柄統計カード */
+.asset-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card.gain-positive {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.stat-card.gain-negative {
+    background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+}
+
+/* 銘柄フィルター */
+.asset-filters {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    border: 1px solid #e9ecef;
+}
+
+.filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: end;
+}
+
+.btn-clear {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-clear:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+}
+
+/* 銘柄グリッド */
+.asset-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 1.5rem;
+}
+
+.asset-card {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.asset-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(45deg, #007bff, #28a745);
+    transition: width 0.3s ease;
+}
+
+.asset-card:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    transform: translateY(-3px);
+}
+
+.asset-card:hover::before {
+    width: 8px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.asset-title h4 {
+    margin: 0 0 0.5rem 0;
+    color: #2c3e50;
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.ticker-info {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+.ticker {
+    background: #e9ecef;
+    color: #495057;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+}
+
+.type-badge {
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-align: center;
+}
+
+.type-stock { 
+    background: #cce5ff; 
+    color: #0056b3; 
+}
+
+.type-mutualfund { 
+    background: #d4edda; 
+    color: #155724; 
+}
+
+.type-crypto { 
+    background: #fff3cd; 
+    color: #856404; 
+}
+
+.asset-badges {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-end;
+}
+
+.market-badge {
+    background: #f8f9fa;
+    color: #495057;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: 1px solid #dee2e6;
+}
+
+/* メトリクス表示 */
+.card-metrics {
+    margin-bottom: 1.5rem;
+}
+
+.metric-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.metric {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+.metric label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+}
+
+.metric .value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #2c3e50;
+    word-wrap: break-word;
+}
+
+.metric .value.amount {
+    color: #28a745;
+    font-size: 1rem;
+    font-family: 'Courier New', monospace;
+}
+
+.gain-row .metric {
+    flex: none;
+    width: 100%;
+}
+
+.gain-positive {
+    color: #28a745 !important;
+}
+
+.gain-negative {
+    color: #dc3545 !important;
+}
+
+/* カード詳細情報 */
+.card-details {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    min-height: 24px;
+}
+
+.detail-item:last-child {
+    margin-bottom: 0;
+}
+
+.detail-item label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: 500;
+    min-width: 80px;
+}
+
+.sector-badge {
+    background: #fff3cd;
+    color: #856404;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.sector-edit {
+    padding: 0.3rem 0.5rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    background: white;
+    min-width: 120px;
+}
+
+/* カスタムタグ */
+.custom-tags {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    width: 100%;
+}
+
+.custom-tag {
+    display: inline-flex;
+    align-items: center;
+    background: #e3f2fd;
+    color: #1976d2;
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    gap: 0.25rem;
+}
+
+.tag-remove {
+    background: none;
+    border: none;
+    color: #d32f2f;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 0;
+    margin-left: 0.25rem;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.tag-remove:hover {
+    background: #ffebee;
+}
+
+/* カードアクション */
+.card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.card-actions .btn-action,
+.btn-edit,
+.btn-tag {
+    flex: 1;
+    min-width: 80px;
+    text-align: center;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.btn-edit {
+    background: #ffc107;
+    color: #212529;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-edit:hover {
+    background: #e0a800;
+    transform: translateY(-1px);
+}
+
+.btn-tag {
+    background: #6610f2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-tag:hover {
+    background: #520dc2;
+    transform: translateY(-1px);
+}
+
+/* データなし表示 */
+.no-assets {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.no-data-message h4 {
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.no-data-message p {
+    color: #adb5bd;
+    margin: 0;
+}
+
+/* ===============================
+   追加: アニメーション・インタラクション強化
+   =============================== */
+
+/* ページ遷移アニメーション */
+.page-enter {
+    animation: slideInFromBottom 0.4s ease-out;
+}
+
+@keyframes slideInFromBottom {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ローディング改善 */
+.loading-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.skeleton-card {
+    height: 200px;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+}
+
+/* ツールチップスタイル */
+.tooltip {
+    position: relative;
+    cursor: help;
+}
+
+.tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    z-index: 1000;
+}
+
+.tooltip:hover::after {
+    opacity: 1;
+}
+
+/* フォーカス・アクセシビリティ強化 */
+.btn-action:focus,
+.btn-export:focus,
+.btn-refresh:focus,
+.tab-btn:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+/* 高コントラスト対応 */
+@media (prefers-contrast: high) {
+    .type-badge,
+    .region-badge,
+    .sector-badge {
+        border: 2px solid currentColor;
+        font-weight: 700;
+    }
+    
+    .asset-card {
+        border: 2px solid #333;
+    }
+    
+    .btn-action {
+        border: 2px solid white;
+    }
+}
+
+/* 低速接続対応 */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ===============================
+   追加: フィルター・検索UI強化
+   =============================== */
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 140px;
+}
+
+.filter-group label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+}
+
+.filter-group input {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.filter-group input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+    outline: none;
+}
+
+.filter-group select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background: white;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.filter-group select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+    outline: none;
+}
+
+/* 検索ボックス強化 */
+.search-container {
+    position: relative;
+}
+
+.search-clear {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.search-clear:hover {
+    background: #f8f9fa;
+    color: #495057;
+}
+
+/* ===============================
+   追加: データビジュアライゼーション強化
+   =============================== */
+
+/* 進捗バー */
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: #e9ecef;
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 0.5rem 0;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #28a745, #20c997);
+    border-radius: 3px;
+    transition: width 0.6s ease;
+}
+
+.progress-fill.negative {
+    background: linear-gradient(90deg, #dc3545, #e74c3c);
+}
+
+/* チャートプレースホルダー */
+.chart-placeholder {
+    width: 100%;
+    height: 200px;
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* ===============================
+   追加: エラー状態・空状態の改善
+   =============================== */
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    border: 2px dashed #dee2e6;
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    color: #adb5bd;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.empty-state p {
+    color: #adb5bd;
+    margin-bottom: 2rem;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.5;
+}
+
+.btn-empty-action {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-empty-action:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,123,255,0.3);
+}
+
+/* エラー状態の改善 */
+.error-container {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+}
+
+.error-title {
+    color: #721c24;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.error-description {
+    color: #856404;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+.error-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+/* ===============================
+   追加: パフォーマンス最適化
+   =============================== */
+
+/* GPU加速 */
+.asset-card,
+.transaction-row,
+.btn-action {
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+/* 大量データ対応 */
+.virtual-scroll-container {
+    height: 400px;
+    overflow-y: auto;
+    position: relative;
+}
+
+.virtual-scroll-item {
+    position: absolute;
+    width: 100%;
+    left: 0;
+}
+
+/* レスポンシブ対応（銘柄グリッド用） */
+@media (max-width: 1200px) {
+    .asset-grid {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .asset-controls {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+    
+    .control-actions {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .asset-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .asset-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .asset-card {
+        padding: 1rem;
+    }
+    
+    .card-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .asset-badges {
+        align-items: flex-start;
+        flex-direction: row;
+        gap: 0.5rem;
+    }
+    
+    .metric-row {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .detail-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+    
+    .detail-item label {
+        min-width: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .asset-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+    }
+    
+    .asset-title h4 {
+        font-size: 1rem;
+    }
+    
+    .card-actions {
+        flex-direction: column;
+    }
+    
+    .card-actions .btn-action,
+    .btn-edit,
+    .btn-tag {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .filter-row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .filter-group {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .database-header {
+        padding: 1rem;
+    }
+    
+    .database-header h1 {
+        font-size: 1.3rem;
+    }
+}
+
+/* ===============================
+   追加: プリント用スタイル
+   =============================== */
+
+@media print {
+    .database-page {
+        background: white;
+        padding: 0;
+    }
+    
+    .btn-action,
+    .btn-export,
+    .btn-refresh,
+    .btn-edit,
+    .btn-tag {
+        display: none;
+    }
+    
+    .asset-card,
+    .transaction-table-wrapper {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        page-break-inside: avoid;
+    }
+    
+    .database-tabs {
+        display: none;
+    }
+    
+    .tab-content {
+        display: block !important;
+    }
+}
+
+/* ===============================
+   追加: カスタムスクロールバー
+   =============================== */
+
+.database-content::-webkit-scrollbar,
+.transaction-table-wrapper::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.database-content::-webkit-scrollbar-track,
+.transaction-table-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.database-content::-webkit-scrollbar-thumb,
+.transaction-table-wrapper::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.database-content::-webkit-scrollbar-thumb:hover,
+.transaction-table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Firefox */
+.database-content,
+.transaction-table-wrapper {
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+/* ===============================
+   追加: トグル・編集モード強化
+   =============================== */
+
+.btn-toggle {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-toggle::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.6s;
+}
+
+.btn-toggle:hover::before {
+    left: 100%;
+}
+
+.btn-toggle.active {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    box-shadow: 0 4px 8px rgba(40,167,69,0.3);
+    transform: translateY(-1px);
+}
+
+.btn-toggle:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+}
+
+.btn-toggle.active:hover {
+    background: linear-gradient(135deg, #218838, #1e9b7e);
+    box-shadow: 0 6px 12px rgba(40,167,69,0.4);
+}
+
+/* 編集モード表示 */
+.edit-mode-indicator {
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    background: linear-gradient(135deg, #ffc107, #e0a800);
+    color: #212529;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(255,193,7,0.3);
+    animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 4px 8px rgba(255,193,7,0.3);
+    }
+    50% {
+        box-shadow: 0 4px 16px rgba(255,193,7,0.5);
+    }
+}
+
+/* ===============================
+   完了: DatabaseView.css 拡張完了
+   =============================== */

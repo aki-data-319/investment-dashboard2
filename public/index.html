@@ -13,10 +13,13 @@
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/modal-form.css">
     <link rel="stylesheet" href="css/navigation.css">
+    <link rel="stylesheet" href="../src/ui/styles/DatabaseView.css">
     
     <!-- 外部ライブラリ（Chart.js、Lucide Icons） -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <!-- CSV Parser (PapaParse) -->
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <style>
         :root {
             --background: oklch(1 0 0);
@@ -66,6 +69,15 @@
         </footer>
     </div>
 
+    <!-- データベース関連スクリプト読み込み -->
+    <script src="../src/business/services/TransactionDatabaseService.js"></script>
+    <script src="../src/business/services/AssetDatabaseService.js"></script>
+    <script src="../src/ui/components/TransactionTable.js"></script>
+    <script src="../src/ui/components/AssetGrid.js"></script>
+    <script src="../src/ui/views/DatabaseView.js"></script>
+    <script src="../src/ui/controllers/DatabaseController.js"></script>
+    <script src="../src/utils/DatabaseTestUtility.js"></script>
+    
     <!-- JavaScript読み込み（ES6 modules） -->
     <script type="module" src="js/app.js"></script>
     

@@ -1,5 +1,7 @@
 import { DashboardController } from './controllers/DashboardController.js';
 import { AssetFormController } from './controllers/AssetFormController.js';
+import { CsvImportController } from './controllers/CsvImportController.js';
+import { DatabaseController } from './controllers/DatabaseController.js';
 
 /**
  * Router - 統合ルーティング・ナビゲーション管理
@@ -38,6 +40,18 @@ export class Router {
             title: '資産追加',
             icon: 'plus-circle',
             description: '新しい投資信託の追加'
+        });
+        
+        this.registerRoute('import-csv', CsvImportController, {
+            title: 'CSV取り込み',
+            icon: 'upload',
+            description: '取引履歴CSVの取り込み'
+        });
+        
+        this.registerRoute('database', DatabaseController, {
+            title: 'データベース',
+            icon: 'database',
+            description: '取引履歴・銘柄情報の詳細管理'
         });
         
         // 初期化実行
@@ -342,6 +356,19 @@ export class Router {
                 if (typeof controller.openForm === 'function') {
                     controller.openForm(data);
                 }
+            } else if (path === 'import-csv') {
+                if (typeof controller.initialize === 'function') {
+                    await controller.initialize();
+                } else if (typeof controller.render === 'function') {
+                    controller.render();
+                }
+            } else if (path === 'database') {
+                // データベース画面の場合は表示
+                if (typeof controller.showDatabase === 'function') {
+                    controller.showDatabase(data);
+                } else if (typeof controller.initialize === 'function') {
+                    await controller.initialize();
+                }
             }
             
             // 現在のビューを更新
@@ -375,6 +402,14 @@ export class Router {
                 const controller = this.controllers.get(this.currentView);
                 if (controller && typeof controller.closeForm === 'function') {
                     controller.closeForm();
+                }
+            }
+            
+            // データベース画面の場合は非表示処理
+            if (this.currentView === 'database') {
+                const databaseContainer = document.getElementById('databaseContainer');
+                if (databaseContainer) {
+                    databaseContainer.style.display = 'none';
                 }
             }
             
@@ -427,9 +462,13 @@ export class Router {
                 controller = new ControllerClass();
             } else if (ControllerClass === AssetFormController) {
                 // AssetFormControllerは依存関係を注入
-                // 注意: 実際にはDashboardControllerから取得する必要があるが、
-                // 簡単のため、必要時に遅延初期化する設計にする
-                const dashboardController = this.controllers.get('dashboard');
+                // 必要であればDashboardControllerを先に作成
+                let dashboardController = this.controllers.get('dashboard');
+                if (!dashboardController) {
+                    console.log('🔄 Creating DashboardController for AssetFormController dependency...');
+                    dashboardController = await this.#getOrCreateController('dashboard');
+                }
+                
                 if (dashboardController) {
                     controller = new ControllerClass(
                         dashboardController.assetRepository,
@@ -438,6 +477,38 @@ export class Router {
                 } else {
                     console.warn('⚠️ DashboardController not found, creating AssetFormController without dependencies');
                     return null; // 依存関係が不足している場合は作成しない
+                }
+            } else if (ControllerClass === CsvImportController) {
+                // 必要であればDashboardControllerを先に作成
+                let dashboardController = this.controllers.get('dashboard');
+                if (!dashboardController) {
+                    console.log('🔄 Creating DashboardController for CsvImportController dependency...');
+                    dashboardController = await this.#getOrCreateController('dashboard');
+                }
+                
+                if (dashboardController) {
+                    controller = new ControllerClass(
+                        dashboardController.assetRepository,
+                        dashboardController
+                    );
+                } else {
+                    console.warn('⚠️ DashboardController not found, creating CsvImportController without dependencies');
+                    return null;
+                }
+            } else if (ControllerClass === DatabaseController) {
+                // DatabaseControllerは引数でDataStoreManagerを受け取る
+                // 必要であればDashboardControllerを先に作成
+                let dashboardController = this.controllers.get('dashboard');
+                if (!dashboardController) {
+                    console.log('🔄 Creating DashboardController for DatabaseController dependency...');
+                    dashboardController = await this.#getOrCreateController('dashboard');
+                }
+                
+                if (dashboardController && dashboardController.dataStoreManager) {
+                    controller = new ControllerClass(dashboardController.dataStoreManager);
+                } else {
+                    console.warn('⚠️ DashboardController or DataStoreManager not found, creating DatabaseController without dependencies');
+                    return null;
                 }
             }
             
