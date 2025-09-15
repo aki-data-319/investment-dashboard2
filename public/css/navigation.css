@@ -1,0 +1,343 @@
+/**
+ * Navigation CSS - ナビゲーションヘッダーのスタイリング
+ * Phase 1.1 ビュー間ナビゲーション実装用のスタイルシート
+ */
+
+/* ========================================
+   ナビゲーションヘッダー - メインスタイル
+   ======================================== */
+
+.app-navigation {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--card);
+    border-bottom: 2px solid var(--border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+.navigation-header {
+    width: 100%;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    gap: 2rem;
+}
+
+/* ========================================
+   ブランド部分
+   ======================================== */
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.brand-icon {
+    width: 1.75rem;
+    height: 1.75rem;
+    stroke-width: 2.5;
+}
+
+.brand-text {
+    white-space: nowrap;
+}
+
+/* ========================================
+   ナビゲーションタブ
+   ======================================== */
+
+.nav-tabs {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.nav-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.925rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    min-height: 2.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-tab::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: -1;
+}
+
+/* タブホバー効果 */
+.nav-tab:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.nav-tab:hover::before {
+    opacity: 1;
+}
+
+/* アクティブタブ */
+.nav-tab.active {
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--primary);
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.nav-tab.active::before {
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 1;
+}
+
+/* タブ押下効果 */
+.nav-tab:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* フォーカス表示（アクセシビリティ） */
+.nav-tab:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.7);
+    outline-offset: 2px;
+}
+
+/* ========================================
+   アイコンとテキスト
+   ======================================== */
+
+.nav-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    stroke-width: 2;
+    flex-shrink: 0;
+}
+
+.nav-text {
+    white-space: nowrap;
+    font-size: 0.925rem;
+}
+
+/* ========================================
+   レスポンシブデザイン - タブレット
+   ======================================== */
+
+@media (max-width: 1024px) {
+    .nav-container {
+        padding: 0.75rem 1rem;
+        gap: 1.5rem;
+    }
+    
+    .nav-brand {
+        font-size: 1.125rem;
+    }
+    
+    .brand-icon {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+    
+    .nav-tab {
+        padding: 0.5rem 0.875rem;
+        font-size: 0.875rem;
+        min-height: 2.25rem;
+    }
+    
+    .nav-icon {
+        width: 1.125rem;
+        height: 1.125rem;
+    }
+}
+
+/* ========================================
+   レスポンシブデザイン - モバイル
+   ======================================== */
+
+@media (max-width: 768px) {
+    .nav-container {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 0.75rem 1rem;
+    }
+    
+    .nav-brand {
+        font-size: 1rem;
+        align-self: flex-start;
+    }
+    
+    .brand-text {
+        display: none; /* モバイルではアイコンのみ */
+    }
+    
+    .nav-tabs {
+        width: 100%;
+        justify-content: center;
+        gap: 0.25rem;
+    }
+    
+    .nav-tab {
+        flex: 1;
+        justify-content: center;
+        padding: 0.625rem 0.5rem;
+        font-size: 0.825rem;
+        min-height: 2.5rem;
+    }
+    
+    .nav-text {
+        font-size: 0.825rem;
+    }
+}
+
+/* ========================================
+   レスポンシブデザイン - 極小デバイス
+   ======================================== */
+
+@media (max-width: 480px) {
+    .nav-container {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .nav-tabs {
+        gap: 0.125rem;
+    }
+    
+    .nav-tab {
+        flex-direction: column;
+        gap: 0.25rem;
+        padding: 0.5rem 0.25rem;
+        font-size: 0.75rem;
+        min-height: 3rem;
+    }
+    
+    .nav-icon {
+        width: 1rem;
+        height: 1rem;
+    }
+    
+    .nav-text {
+        font-size: 0.75rem;
+        line-height: 1;
+    }
+}
+
+/* ========================================
+   ビュー切り替えアニメーション
+   ======================================== */
+
+.main-content {
+    transition: all 0.3s ease;
+}
+
+.main-content.view-hidden {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+.main-content.view-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ========================================
+   アクセシビリティ強化
+   ======================================== */
+
+/* 高コントラストモード対応 */
+@media (prefers-contrast: high) {
+    .navigation-header {
+        background: var(--primary);
+    }
+    
+    .nav-tab {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+    
+    .nav-tab.active {
+        background: white;
+        border: 2px solid var(--primary);
+    }
+}
+
+/* 動きを減らす設定に対応 */
+@media (prefers-reduced-motion: reduce) {
+    .nav-tab,
+    .main-content,
+    .nav-tab::before {
+        transition: none;
+    }
+    
+    .nav-tab:hover {
+        transform: none;
+    }
+    
+    .nav-tab:active {
+        transform: none;
+    }
+}
+
+/* ========================================
+   ダークモード対応（将来拡張用）
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+    .app-navigation {
+        border-bottom-color: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .navigation-header {
+        background: linear-gradient(135deg, 
+            oklch(0.15 0.08 195), 
+            oklch(0.25 0.12 65));
+    }
+    
+    .nav-tab.active {
+        background: rgba(255, 255, 255, 0.95);
+        color: var(--primary);
+    }
+}
+
+/* ========================================
+   印刷時のスタイル
+   ======================================== */
+
+@media print {
+    .app-navigation {
+        display: none;
+    }
+}

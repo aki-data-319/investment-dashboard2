@@ -1,0 +1,484 @@
+/* 投資信託追加フォーム - モーダルスタイル */
+
+/* ========================================
+   モーダル基本構造
+   ======================================== */
+
+.asset-form-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.asset-form-modal.modal-show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-md);
+    overflow-y: auto;
+}
+
+.modal-container {
+    background-color: var(--background);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.asset-form-modal.modal-show .modal-container {
+    transform: translateY(0);
+}
+
+/* ========================================
+   モーダルヘッダー
+   ======================================== */
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-lg) var(--space-lg) var(--space-md);
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.modal-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background-color: transparent;
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover {
+    background-color: var(--surface);
+    color: var(--text-primary);
+}
+
+/* ========================================
+   フォーム構造
+   ======================================== */
+
+.asset-form {
+    padding: var(--space-lg);
+}
+
+.form-section {
+    margin-bottom: var(--space-xl);
+}
+
+.form-section:last-child {
+    margin-bottom: 0;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-sm);
+    border-bottom: 2px solid var(--accent);
+}
+
+.required-badge {
+    background-color: var(--error);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+}
+
+.optional-badge {
+    background-color: var(--text-secondary);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+}
+
+/* ========================================
+   フォームフィールド
+   ======================================== */
+
+.form-field {
+    margin-bottom: var(--space-lg);
+}
+
+.form-field-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.field-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+}
+
+.required-mark {
+    color: var(--error);
+    font-weight: 600;
+}
+
+.field-input,
+.field-select,
+.field-textarea {
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    background-color: var(--background);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.field-input:focus,
+.field-select:focus,
+.field-textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(22, 78, 99, 0.1);
+}
+
+.field-input::placeholder,
+.field-textarea::placeholder {
+    color: var(--text-secondary);
+}
+
+.field-textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* 入力グループ（単位付き入力など） */
+.input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-group .field-input {
+    padding-right: 40px;
+}
+
+.input-suffix {
+    position: absolute;
+    right: var(--space-md);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    pointer-events: none;
+}
+
+/* ========================================
+   エラー表示
+   ======================================== */
+
+.form-error-area {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.error-message {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--error);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.field-error {
+    display: none;
+    color: var(--error);
+    font-size: 0.75rem;
+    margin-top: var(--space-xs);
+    font-weight: 500;
+}
+
+.field-error-state {
+    border-color: var(--error) !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+.field-help {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    margin-top: var(--space-xs);
+}
+
+/* ========================================
+   成功メッセージ
+   ======================================== */
+
+.success-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--success);
+    color: white;
+    padding: var(--space-lg) var(--space-xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    z-index: 10;
+}
+
+.success-content {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* ========================================
+   フォームフッター・ボタン
+   ======================================== */
+
+.form-footer {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: flex-end;
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--border);
+    margin-top: var(--space-xl);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    min-width: 120px;
+    position: relative;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--primary), black 10%);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+    background-color: var(--background);
+    color: var(--text-primary);
+    border-color: var(--border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background-color: var(--surface);
+    border-color: var(--text-secondary);
+}
+
+.btn-loading {
+    display: none;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.btn-text {
+    display: inline;
+}
+
+/* ローディング状態 */
+.form-loading .field-input,
+.form-loading .field-select,
+.form-loading .field-textarea {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* アニメーション */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* ========================================
+   レスポンシブデザイン
+   ======================================== */
+
+@media (max-width: 768px) {
+    .modal-overlay {
+        padding: var(--space-sm);
+        align-items: flex-start;
+    }
+    
+    .modal-container {
+        max-height: 95vh;
+        margin-top: var(--space-sm);
+    }
+    
+    .modal-header {
+        padding: var(--space-md);
+    }
+    
+    .asset-form {
+        padding: var(--space-md);
+    }
+    
+    .modal-title {
+        font-size: 1.125rem;
+    }
+    
+    .form-field-group {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+    
+    .form-footer {
+        flex-direction: column-reverse;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-overlay {
+        padding: 0;
+    }
+    
+    .modal-container {
+        max-height: 100vh;
+        border-radius: 0;
+        margin: 0;
+    }
+    
+    .section-title {
+        font-size: 0.9rem;
+    }
+    
+    .field-label {
+        font-size: 0.8rem;
+    }
+    
+    .field-input,
+    .field-select,
+    .field-textarea {
+        font-size: 0.8rem;
+        padding: var(--space-sm);
+    }
+}
+
+/* ========================================
+   アクセシビリティ改善
+   ======================================== */
+
+/* フォーカス表示の強化 */
+.modal-close-btn:focus,
+.btn:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* 高コントラストモード対応 */
+@media (prefers-contrast: high) {
+    .field-input,
+    .field-select,
+    .field-textarea {
+        border-width: 2px;
+    }
+    
+    .field-error-state {
+        border-width: 3px !important;
+    }
+}
+
+/* モーション減少設定対応 */
+@media (prefers-reduced-motion: reduce) {
+    .asset-form-modal,
+    .modal-container,
+    .btn,
+    .field-input,
+    .field-select,
+    .field-textarea {
+        transition: none;
+    }
+    
+    .animate-spin {
+        animation: none;
+    }
+}

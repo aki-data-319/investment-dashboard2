@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>投資ダッシュボード - メイン画面</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --background: oklch(1 0 0);
+            --foreground: oklch(0.35 0 0);
+            --card: oklch(0.97 0.02 195);
+            --card-foreground: oklch(0.25 0.05 195);
+            --primary: oklch(0.25 0.05 195);
+            --secondary: oklch(0.55 0.15 65);
+            --muted: oklch(0.96 0 0);
+            --muted-foreground: oklch(0.35 0 0);
+            --accent: oklch(0.55 0.15 65);
+            --destructive: oklch(0.45 0.25 15);
+            --border: oklch(0.9 0 0);
+        }
+        body { background-color: var(--background); color: var(--foreground); }
+        .card { background-color: var(--card); color: var(--card-foreground); border: 1px solid var(--border); }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-secondary { background-color: var(--secondary); color: white; }
+        .text-accent { color: var(--accent); }
+        .text-destructive { color: var(--destructive); }
+        .text-muted { color: var(--muted-foreground); }
+    </style>
+</head>
+<body class="min-h-screen p-4 pb-20">
+    <div class="mx-auto max-w-md space-y-6">
+        <!-- Header -->
+        <div class="text-center">
+            <h1 class="text-2xl font-bold">投資ダッシュボード</h1>
+            <p class="text-sm text-muted mt-1">資産状況とパフォーマンス</p>
+        </div>
+
+        <!-- Monthly Performance Chart -->
+        <div class="card rounded-lg p-4">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-bold">月次パフォーマンス</h2>
+            </div>
+            <!-- Period Selection Tabs -->
+            <div class="flex gap-1 mb-4 bg-gray-100 rounded-lg p-1">
+                <button class="flex-1 py-2 px-3 text-sm rounded-md bg-white shadow-sm font-medium">3ヶ月</button>
+                <button class="flex-1 py-2 px-3 text-sm rounded-md text-muted">6ヶ月</button>
+                <button class="flex-1 py-2 px-3 text-sm rounded-md text-muted">1年</button>
+                <button class="flex-1 py-2 px-3 text-sm rounded-md text-muted">2年</button>
+            </div>
+            <!-- Chart Area -->
+            <div class="h-48 bg-gray-50 rounded-lg flex items-center justify-center">
+                <canvas id="monthlyChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Sector Allocation Chart -->
+        <div class="card rounded-lg p-4">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-bold">セクター配分</h2>
+            </div>
+            <!-- Sector Type Tabs -->
+            <div class="flex gap-1 mb-4 bg-gray-100 rounded-lg p-1">
+                <button class="flex-1 py-2 px-3 text-sm rounded-md bg-white shadow-sm font-medium">地域別</button>
+                <button class="flex-1 py-2 px-3 text-sm rounded-md text-muted">業種別</button>
+                <button class="flex-1 py-2 px-3 text-sm rounded-md text-muted">資産別</button>
+            </div>
+            <!-- Chart Area -->
+            <div class="h-48 bg-gray-50 rounded-lg flex items-center justify-center">
+                <canvas id="sectorChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Summary Card -->
+        <div class="card rounded-lg p-4">
+            <h3 class="text-lg font-bold mb-3">資産サマリー</h3>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <p class="text-xs text-muted">総投資額</p>
+                    <p class="text-lg font-bold">¥2,750,000</p>
+                </div>
+                <div>
+                    <p class="text-xs text-muted">月額積立</p>
+                    <p class="text-lg font-bold">¥105,000</p>
+                </div>
+            </div>
+            <div class="flex items-center justify-between pt-2 border-t">
+                <span class="text-sm text-muted">評価損益</span>
+                <div class="flex items-center gap-2">
+                    <i data-lucide="trending-up" class="h-4 w-4 text-accent"></i>
+                    <span class="font-bold text-accent">¥168,500 (+6.5%)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="grid grid-cols-2 gap-3">
+            <button class="btn-primary h-16 flex flex-col gap-1 rounded-lg border">
+                <i data-lucide="database" class="h-5 w-5"></i>
+                <span class="text-xs">保有銘柄管理</span>
+            </button>
+            <button class="btn-secondary h-16 flex flex-col gap-1 rounded-lg border">
+                <i data-lucide="plus" class="h-5 w-5"></i>
+                <span class="text-xs">銘柄追加</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        
+        // Sample chart initialization
+        const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+        new Chart(monthlyCtx, {
+            type: 'line',
+            data: {
+                labels: ['1月', '2月', '3月'],
+                datasets: [{
+                    label: '累計投資額',
+                    data: [500000, 1000000, 1500000],
+                    borderColor: 'rgb(212, 119, 6)',
+                    backgroundColor: 'rgba(212, 119, 6, 0.1)',
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        const sectorCtx = document.getElementById('sectorChart').getContext('2d');
+        new Chart(sectorCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['全世界株式', '外国株式', '米国株式'],
+                datasets: [{
+                    data: [45, 30, 25],
+                    backgroundColor: ['rgb(22, 78, 99)', 'rgb(212, 119, 6)', 'rgb(236, 254, 255)']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    </script>
+</body>
+</html>

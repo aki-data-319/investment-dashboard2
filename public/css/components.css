@@ -1,0 +1,164 @@
+/* ダッシュボード用コンポーネント */
+
+/* サマリーカード */
+.summary-section {
+    margin-bottom: var(--space-xl);
+}
+
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-lg);
+}
+
+.summary-card {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
+}
+
+.summary-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.card-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-sm);
+}
+
+.card-value {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: var(--space-xs);
+}
+
+.card-description {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+/* アセット一覧 */
+.asset-section {
+    margin-bottom: var(--space-xl);
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-sm);
+    border-bottom: 2px solid var(--accent);
+}
+
+.asset-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.asset-item {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.asset-item:hover {
+    background-color: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.asset-name {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.asset-amount {
+    font-weight: 600;
+    color: var(--accent);
+    font-size: 1.125rem;
+}
+
+/* ボタン */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: color-mix(in srgb, var(--primary), black 10%);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+/* 空状態 */
+.empty-state {
+    text-align: center;
+    padding: var(--space-2xl);
+    color: var(--text-secondary);
+}
+
+.empty-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-md);
+    opacity: 0.5;
+}
+
+/* エラー状態 */
+.error-state {
+    text-align: center;
+    padding: var(--space-2xl);
+    color: var(--error);
+}
+
+.error-state h2 {
+    margin-bottom: var(--space-md);
+    color: var(--error);
+}
+
+/* アクションセクション */
+.action-section {
+    text-align: center;
+    margin-top: var(--space-xl);
+}
+
+/* レスポンシブ */
+@media (max-width: 768px) {
+    .summary-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .asset-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+    }
+}

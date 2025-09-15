@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>投資ダッシュボード v2 - UI優先MVP</title>
+    
+    <!-- TailwindCSS読み込み -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- CSS読み込み -->
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/modal-form.css">
+    <link rel="stylesheet" href="css/navigation.css">
+    
+    <!-- 外部ライブラリ（Chart.js、Lucide Icons） -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        :root {
+            --background: oklch(1 0 0);
+            --foreground: oklch(0.35 0 0);
+            --card: oklch(0.97 0.02 195);
+            --card-foreground: oklch(0.25 0.05 195);
+            --primary: oklch(0.25 0.05 195);
+            --secondary: oklch(0.55 0.15 65);
+            --muted: oklch(0.96 0 0);
+            --muted-foreground: oklch(0.35 0 0);
+            --accent: oklch(0.55 0.15 65);
+            --destructive: oklch(0.45 0.25 15);
+            --border: oklch(0.9 0 0);
+        }
+        body { background-color: var(--background); color: var(--foreground); }
+        .card { background-color: var(--card); color: var(--card-foreground); border: 1px solid var(--border); }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-secondary { background-color: var(--secondary); color: white; }
+        .text-accent { color: var(--accent); }
+        .text-destructive { color: var(--destructive); }
+        .text-muted { color: var(--muted-foreground); }
+    </style>
+</head>
+<body class="min-h-screen p-4 pb-20">
+    <div class="app-container">
+        <!-- ヘッダー -->
+        <header class="app-header">
+            <h1 class="app-title">💰 投資ダッシュボード v2</h1>
+            <p class="app-subtitle">UI層優先実装 - MVP</p>
+        </header>
+
+        <!-- メインコンテンツエリア -->
+        <!-- src/ui/controllers/DashboardController.jsのDashboardViewクラスで定義されているよ -->
+        <main class="main-content" id="mainContent">
+            <!-- ここにDashboardViewの内容が動的に挿入される -->
+            
+            <!-- 初期表示（JavaScript読み込み前） -->
+            <div class="loading-state">
+                <p>📊 ダッシュボードを読み込み中...</p>
+            </div>
+        </main>
+
+        <!-- デバッグ情報（開発中のみ表示） -->
+        <footer class="debug-footer">
+            <p>🔧 開発モード: UI層優先実装</p>
+            <p id="debugInfo">JavaScript未読み込み</p>
+        </footer>
+    </div>
+
+    <!-- JavaScript読み込み（ES6 modules） -->
+    <script type="module" src="js/app.js"></script>
+    
+    <!-- Lucide Icons初期化（ナビゲーション用） -->
+    <script>
+        // DOM読み込み完了後にLucide Iconsを初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+                console.log('✅ Lucide Icons initialized for navigation');
+            }
+        });
+    </script>
+</body>
+</html>
