@@ -329,21 +329,15 @@ class DashboardController {
      */
     async initializeSectorChart() {
         const sectorCtx = document.getElementById('sectorChart');
-        if (sectorCtx) {
-            // v3 exposure を取得
+        if (!sectorCtx) return;
+        try {
             let labels = ['Unclassified'];
-            let values = [1];
-            try {
-                const { exposure } = await this.analysisService.analyze();
-                const top = (exposure?.sector || []).slice(0, 8);
+            let values = [100];
+            const { exposure } = await this.analysisService.analyze();
+            const top = (exposure?.sector || []).slice(0, 8);
+            if (top.length > 0) {
                 labels = top.map((x) => x.key);
                 values = top.map((x) => Number(x.percentage || 0));
-                if (labels.length === 0) {
-                    labels = ['Unclassified']; values = [100];
-                }
-            } catch (e) {
-                console.warn('⚠️ exposure取得に失敗。デフォルトを使用します', e);
-                labels = ['Unclassified']; values = [100];
             }
 
             new Chart(sectorCtx.getContext('2d'), {
@@ -353,9 +347,14 @@ class DashboardController {
                     datasets: [{
                         data: values,
                         backgroundColor: [
-                            'rgb(22, 78, 99)',     // シアン
-                            'rgb(212, 119, 6)',    // アンバー
-                            'rgb(236, 254, 255)'   // ライトシアン
+                            'rgb(22, 78, 99)',
+                            'rgb(212, 119, 6)',
+                            'rgb(236, 254, 255)',
+                            'rgb(30, 64, 175)',
+                            'rgb(16, 185, 129)',
+                            'rgb(234, 179, 8)',
+                            'rgb(244, 63, 94)',
+                            'rgb(107, 114, 128)'
                         ],
                         borderWidth: 0
                     }]
@@ -374,7 +373,8 @@ class DashboardController {
                     }
                 }
             });
-            console.log('✅ Sector chart initialized');
+        } catch (e) {
+            console.error('[DashboardController.js] initializeSectorChart エラー:', e?.message || e);
         }
     }
 

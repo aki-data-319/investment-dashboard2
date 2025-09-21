@@ -3,6 +3,7 @@ import { PortfolioAggregator } from '../business/analysis/PortfolioAggregator.js
 import { SectorService } from '../business/services/SectorService.js';
 import { AssetEntity } from '../domain/entities/AssetEntity.js';
 import { TransactionRepository } from '../data/repositories/TransactionRepository.js';
+import { TransactionEntity } from '../domain/entities/TransactionEntity.js';
 
 /**
  * CsvImportService - CSV取り込みサービス
@@ -221,6 +222,16 @@ export class CsvImportService {
       console.error('[CsvImportService.js] parseAndImport/upsert エラー:', e?.message || e);
       throw e;
     }
+
+    // 受け入れチェック（簡易）
+    try {
+      const acceptance = this.checkImportAcceptance(entities, upsert);
+      console.info('[CsvImportService.js] 受け入れチェック: 符号規約', `不一致 ${acceptance.sign.mismatch}/${acceptance.sign.total} (${(acceptance.sign.rate*100).toFixed(2)}%)`);
+      console.info('[CsvImportService.js] 受け入れチェック: デデュープ', `inserted=${acceptance.dedupe.inserted}, skipped=${acceptance.dedupe.skipped}, updated=${acceptance.dedupe.updated}`);
+      console.info('[CsvImportService.js] 受け入れチェック: 円キャッシュフロー', `流入=¥${Math.round(acceptance.cashflow.inflowJpy).toLocaleString()}, 流出=¥${Math.round(acceptance.cashflow.outflowJpy).toLocaleString()}, ネット=¥${Math.round(acceptance.cashflow.netJpy).toLocaleString()}, 換算不可=${acceptance.cashflow.unknownFx}件`);
+    } catch (e) {
+      console.warn('[CsvImportService.js] 受け入れチェックの実行に失敗:', e?.message || e);
+    }
     return { parse: result, upsert };
   }
 
@@ -252,6 +263,50 @@ export class CsvImportService {
       amount: e.settledAmount,
       currency: e.settledCurrency,
     }));
+  }
+
+  /**
+   * 受け入れチェック（簡易）
+   * Application Layer: 取込ユースケース完了時点のサマリー検証
+   * @param {Array<object>} entities - TransactionEntity[] or plain
+   * @param {{ inserted:number, skipped:number, updated:number }} upsert
+   */
+  checkImportAcceptance(entities = [], upsert = { inserted: 0, skipped: 0, updated: 0 }) {
+    const total = Array.isArray(entities) ? entities.length : 0;
+    let mismatch = 0;
+    let inflowJpy = 0;
+    let outflowJpy = 0;
+    let unknownFx = 0;
+
+    const expectedSign = (tradeType) => TransactionEntity.expectedSignByTradeType(tradeType || '');
+    const toJpy = (e) => {
+      const amt = Number(e.settledAmount || 0);
+      const cur = (e.settledCurrency || e.currency || '').toUpperCase();
+      if (cur === 'JPY') return amt;
+      const fx = Number(e.fxRate || 0);
+      if (!fx || Number.isNaN(fx)) { unknownFx += 1; return 0; }
+      return amt * fx;
+    };
+
+    for (const e of (entities || [])) {
+      const amt = Number(e?.settledAmount || 0);
+      const exp = expectedSign(e?.tradeType);
+      if (exp === 'positive' && !(amt >= 0)) mismatch += 1;
+      else if (exp === 'negative' && !(amt <= 0)) mismatch += 1;
+      // any は不問
+
+      const jpy = toJpy(e);
+      if (jpy >= 0) inflowJpy += jpy; else outflowJpy += jpy; // outflow は負のはず
+    }
+
+    const netJpy = inflowJpy + outflowJpy;
+    const rate = total > 0 ? mismatch / total : 0;
+
+    return {
+      sign: { mismatch, total, rate },
+      dedupe: { inserted: upsert.inserted || 0, skipped: upsert.skipped || 0, updated: upsert.updated || 0 },
+      cashflow: { inflowJpy, outflowJpy, netJpy, unknownFx },
+    };
   }
 
   /**

@@ -22,11 +22,11 @@ export class AssetRepository {
             namespacePrefix: 'investment-',
             versionKey: 'investment-version',
             currentVersion: 1,
-            debug: true
+            debug: false
         });
         this.storageKey = DataStoreManager.DEFAULT_KEYS.ASSETS;
         this.indexKey = DataStoreManager.DEFAULT_KEYS.INDEX;
-        this.debugMode = true;
+        this.debugMode = false;
     }
 
     /**

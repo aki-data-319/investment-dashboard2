@@ -69,20 +69,32 @@ class TransactionDatabaseService {
             if (sub === 'mutual_fund') return 'JP';
             return 'OTHER';
         };
+        const upper = (s) => (s || '').toString().toUpperCase();
+        const normNumber = (v) => {
+            const n = typeof v === 'number' ? v : parseFloat(v || 0);
+            return Number.isNaN(n) ? 0 : n;
+        };
+        const marketFromSubtype = (sub) => {
+            if (sub === 'jp_equity') return 'JP';
+            if (sub === 'us_equity') return 'US';
+            if (sub === 'mutual_fund') return 'FUND';
+            return 'OTHER';
+        };
         return {
             id: e.fingerprint || `${e.source}-${e.tradeDate}-${e.name}`,
             date: this.formatDate(e.tradeDate || e.settleDate || new Date().toISOString()),
-            name: e.name || e.symbol || '-',
-            ticker: e.symbol || '',
+            name: (e.name || e.symbol || '-'),
+            ticker: upper(e.symbol || ''),
             type: typeMap(e.subtype),
-            quantity: typeof e.quantity === 'number' ? e.quantity : parseFloat(e.quantity || 0),
-            unitPrice: typeof e.price === 'number' ? e.price : parseFloat(e.price || 0),
-            amount: typeof e.settledAmount === 'number' ? Math.abs(e.settledAmount) : Math.abs(parseFloat(e.settledAmount || 0)),
-            region: e.market || regionFromSubtype(e.subtype),
-            currency: e.settledCurrency || e.currency || 'JPY',
+            quantity: normNumber(e.quantity),
+            unitPrice: normNumber(e.price),
+            amount: Math.abs(normNumber(e.settledAmount)),
+            region: regionFromSubtype(e.subtype),
+            currency: upper(e.settledCurrency || e.currency || 'JPY'),
             account: e.accountType || '',
             sector: e.sector || '',
-            market: e.market || '',
+            market: marketFromSubtype(e.subtype),
+            side: (e.tradeType || '').toLowerCase(),
             source: e.source || 'rakuten'
         };
     }

@@ -44,7 +44,9 @@ export class DataStoreManager {
         // データが正常に保存できているかチェックするフラグ
         this.isStorageAvailable = this._checkStorageAvailability();
         
-        console.log('📊 DataStoreManager初期化完了:', this.STORAGE_KEYS);
+        if (this.options.debug) {
+            console.log('📊 DataStoreManager初期化完了:', this.STORAGE_KEYS);
+        }
     }
 
     // ===========================================
@@ -108,7 +110,9 @@ export class DataStoreManager {
             const data = localStorage.getItem(key);
             // データが存在しない場合はデフォルト値を返す
             if (data === null) {
-                console.log(`📝 ${key}: データが見つからないため、デフォルト値を使用`);
+                if (this.options.debug) {
+                    console.log(`📝 ${key}: データが見つからないため、デフォルト値を使用`);
+                }
                 return defaultValue;
             }
             // JSON文字列をJavaScriptオブジェクトに変換
@@ -137,7 +141,9 @@ export class DataStoreManager {
         try {
             // JavaScriptオブジェクトをJSON文字列に変換して保存
             localStorage.setItem(key, JSON.stringify(data));
-            console.log(`✅ ${key}: データ保存成功`);
+            if (this.options.debug) {
+                console.log(`✅ ${key}: データ保存成功`);
+            }
             return true;
         } catch (error) {
             console.error(`❌ ${key}のデータ保存エラー:`, error.message);

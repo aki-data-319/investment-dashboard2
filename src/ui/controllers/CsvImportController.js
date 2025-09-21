@@ -66,6 +66,11 @@ class CsvImportController {
         if (!options?.dryRun && this.dashboardController && typeof this.dashboardController.refreshData === 'function') {
           await this.dashboardController.refreshData();
         }
+
+        // ナビゲーションのハイライト整合: ダッシュボードへ遷移
+        if (!options?.dryRun && window.app && window.app.router && typeof window.app.router.navigate === 'function') {
+          await window.app.router.navigate('dashboard');
+        }
       } catch (e) {
         console.error('[CsvImportController.js] onImport エラー:', e?.message || e);
         this.view.hideLoading('インポートに失敗しました');

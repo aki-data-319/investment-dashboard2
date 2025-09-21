@@ -1,4 +1,5 @@
 import { DataStoreManager } from '../managers/DataStoreManager.js';
+import sectorMaster from '../../business/data/sectors.master.js';
 
 /**
  * ExposureRepository - 最小実装版
@@ -49,11 +50,22 @@ export class ExposureRepository {
     try {
       const map = this.store.load(this.SECTOR_KEY) || {};
       if (map[instrumentKey]) return map[instrumentKey];
+
+      // マスタによる推定（シンボル/コード一致 or キーワード）
+      const sym = (instrumentKey.split(':')[1] || '').toUpperCase();
+      if (sectorMaster?.symbols) {
+        const sectorBySymbol = sectorMaster.symbols[sym] || sectorMaster.symbols[sym.toLowerCase()];
+        if (sectorBySymbol) return [{ sectorId: sectorBySymbol, weight: 1 }];
+      }
+      if (sectorMaster?.keywords) {
+        const key = Object.keys(sectorMaster.keywords).find(k => sym.includes(k.toUpperCase()));
+        if (key) return [{ sectorId: sectorMaster.keywords[key], weight: 1 }];
+      }
     } catch (e) {
       console.error('[ExposureRepository.js] getSectorExposure エラー:', e?.message || e);
     }
     // デフォルト: Unclassified 100%
-    return [{ sectorId: 'Unclassified', weight: 1 }];
+    return [{ sectorId: (sectorMaster?.defaultSector || 'Unclassified'), weight: 1 }];
   }
 
   getRegionExposure(instrumentKey /*, asOf */) {

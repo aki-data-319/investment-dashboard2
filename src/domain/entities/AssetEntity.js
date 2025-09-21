@@ -35,7 +35,7 @@ export class AssetEntity {
      * });
      */
     constructor(data = {}) {
-        console.log('🏭 Creating AssetEntity:', data.name || 'Unnamed Asset');
+        if (typeof window !== 'undefined' && window.APP_DEBUG) console.log('🏭 Creating AssetEntity:', data.name || 'Unnamed Asset');
         
         // 基本プロパティ
         this.id = data.id || this.generateId();
@@ -66,7 +66,7 @@ export class AssetEntity {
         // バリデーション実行
         this.validate();
         
-        console.log('✅ AssetEntity created:', this.name);
+        if (typeof window !== 'undefined' && window.APP_DEBUG) console.log('✅ AssetEntity created:', this.name);
     }
 
     /**
@@ -159,7 +159,7 @@ export class AssetEntity {
             throw new Error('投資額は0より大きい必要があります');
         }
 
-        console.log(`💰 Adding investment: ¥${amount.toLocaleString()}, quantity: ${quantity}`);
+        if (typeof window !== 'undefined' && window.APP_DEBUG) console.log(`💰 Adding investment: ¥${amount.toLocaleString()}, quantity: ${quantity}`);
 
         this.totalInvestment += amount;
         this.quantity += quantity;
@@ -171,7 +171,7 @@ export class AssetEntity {
         
         this.updatedAt = new Date().toISOString();
         
-        console.log(`✅ Investment added. Total: ¥${this.totalInvestment.toLocaleString()}`);
+        if (typeof window !== 'undefined' && window.APP_DEBUG) console.log(`✅ Investment added. Total: ¥${this.totalInvestment.toLocaleString()}`);
         return this;
     }
 
@@ -190,12 +190,12 @@ export class AssetEntity {
             throw new Error('現在価値は0以上である必要があります');
         }
         
-        console.log(`📊 Updating current value from ¥${this.currentValue.toLocaleString()} to ¥${newValue.toLocaleString()}`);
+        if (typeof window !== 'undefined' && window.APP_DEBUG) console.log(`📊 Updating current value from ¥${this.currentValue.toLocaleString()} to ¥${newValue.toLocaleString()}`);
         
         this.currentValue = newValue;
         this.updatedAt = new Date().toISOString();
         
-        console.log('✅ Current value updated');
+        if (typeof window !== 'undefined' && window.APP_DEBUG) console.log('✅ Current value updated');
         return this;
     }
 
@@ -262,7 +262,7 @@ export class AssetEntity {
      * });
      */
     static fromJSON(json) {
-        console.log('🔄 Creating AssetEntity from JSON data');
+        if (typeof window !== 'undefined' && window.APP_DEBUG) console.log('🔄 Creating AssetEntity from JSON data');
         return new AssetEntity(json);
     }
 
@@ -279,7 +279,7 @@ export class AssetEntity {
      * console.log(originalAsset.name); // '元の資産' (変更されない)
      */
     clone() {
-        console.log(`🔄 Cloning AssetEntity: ${this.name}`);
+        if (typeof window !== 'undefined' && window.APP_DEBUG) console.log(`🔄 Cloning AssetEntity: ${this.name}`);
         return new AssetEntity(this.toJSON());
     }
 
@@ -395,7 +395,7 @@ export class AssetEntity {
      * @throws {Error}
      */
     static createFromForm(formData) {
-        console.log('🏭 Creating AssetEntity from form data:', formData);
+        if (typeof window !== 'undefined' && window.APP_DEBUG) console.log('🏭 Creating AssetEntity from form data:', formData);
 
         // ビジネスルール適用：currentValueのデフォルト設定
         const processedData = {
@@ -411,7 +411,7 @@ export class AssetEntity {
         // AssetEntity インスタンス作成
         const assetEntity = new AssetEntity(processedData);
 
-        console.log('✅ AssetEntity created from form data:', assetEntity.name);
+        if (typeof window !== 'undefined' && window.APP_DEBUG) console.log('✅ AssetEntity created from form data:', assetEntity.name);
         return assetEntity;
     }
 
@@ -435,7 +435,7 @@ export class AssetEntity {
             return { isDuplicate: false, duplicateAsset: null };
         }
 
-        console.log(`🔍 Checking duplicate for: "${name}"`);
+        if (typeof window !== 'undefined' && window.APP_DEBUG) console.log(`🔍 Checking duplicate for: "${name}"`);
 
         const normalizedName = name.trim().toLowerCase();
         
@@ -448,7 +448,7 @@ export class AssetEntity {
             duplicateAsset: duplicateAsset || null
         };
 
-        console.log(`${result.isDuplicate ? '❌' : '✅'} Duplicate check result:`, result.isDuplicate);
+        if (typeof window !== 'undefined' && window.APP_DEBUG) console.log(`${result.isDuplicate ? '❌' : '✅'} Duplicate check result:`, result.isDuplicate);
         return result;
     }
 
@@ -546,4 +546,3 @@ export class AssetEntity {
 
 // デフォルトエクスポート
 export default AssetEntity;
-
