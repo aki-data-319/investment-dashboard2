@@ -5,7 +5,7 @@
  * 内部永続化は DataStoreManager に委譲する（外部APIは変更なし）。
  */
 
-import { AssetEntity } from '../../business/models/AssetEntity.js';
+import { AssetEntity } from '../../domain/entities/AssetEntity.js';
 import { DataStoreManager } from '../managers/DataStoreManager.js';
 
 export class AssetRepository {

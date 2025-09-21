@@ -3,6 +3,7 @@ import { AssetRepository } from '../../data/repositories/AssetRepository.js';
 import { LocalStorageAdapter } from '../../infrastructure/LocalStorageAdapter.js';
 import { AssetFormController } from './AssetFormController.js';
 import { DataStoreManager } from '../../data/managers/DataStoreManager.js';
+import { PortfolioAnalysisService } from '../../services/PortfolioAnalysisService.js';
 
 /**
  * DashboardController - ダッシュボード画面の制御を担当
@@ -23,6 +24,7 @@ class DashboardController {
         // データレイヤーの初期化
         const storageAdapter = new LocalStorageAdapter();
         this.assetRepository = new AssetRepository(storageAdapter);
+        this.analysisService = new PortfolioAnalysisService({});
         
         // DataStoreManagerの初期化（DatabaseController用）
         this.dataStoreManager = new DataStoreManager(storageAdapter);
@@ -71,7 +73,7 @@ class DashboardController {
             console.log('✅ Dashboard initialized successfully');
             
         } catch (error) {
-            console.error('❌ Dashboard initialization failed:', error);
+            console.error('[DashboardController.js] initialize エラー:', error?.message || error);
             this.view.showError('ダッシュボードの初期化に失敗しました');
         }
     }
@@ -246,7 +248,7 @@ class DashboardController {
             console.log('🎉 Asset added and view updated with real data');
             
         } catch (error) {
-            console.error('❌ Failed to add asset:', error);
+            console.error('[DashboardController.js] handleAddAsset エラー:', error?.message || error);
             alert(`資産追加エラー: ${error.message}`);
         }
     }
@@ -325,15 +327,31 @@ class DashboardController {
      * controller.initializeSectorChart();
      * // セクター配分ドーナツチャートが描画される
      */
-    initializeSectorChart() {
+    async initializeSectorChart() {
         const sectorCtx = document.getElementById('sectorChart');
         if (sectorCtx) {
+            // v3 exposure を取得
+            let labels = ['Unclassified'];
+            let values = [1];
+            try {
+                const { exposure } = await this.analysisService.analyze();
+                const top = (exposure?.sector || []).slice(0, 8);
+                labels = top.map((x) => x.key);
+                values = top.map((x) => Number(x.percentage || 0));
+                if (labels.length === 0) {
+                    labels = ['Unclassified']; values = [100];
+                }
+            } catch (e) {
+                console.warn('⚠️ exposure取得に失敗。デフォルトを使用します', e);
+                labels = ['Unclassified']; values = [100];
+            }
+
             new Chart(sectorCtx.getContext('2d'), {
                 type: 'doughnut',
                 data: {
-                    labels: ['全世界株式', '全米株式', '先進国株式'],
+                    labels,
                     datasets: [{
-                        data: [45, 30, 25],
+                        data: values,
                         backgroundColor: [
                             'rgb(22, 78, 99)',     // シアン
                             'rgb(212, 119, 6)',    // アンバー
@@ -388,7 +406,7 @@ class DashboardController {
             console.log('✅ Dashboard data refreshed successfully');
             
         } catch (error) {
-            console.error('❌ Failed to refresh dashboard data:', error);
+            console.error('[DashboardController.js] refreshData エラー:', error?.message || error);
             this.view.showError('データの更新に失敗しました');
         }
     }

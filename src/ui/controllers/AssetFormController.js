@@ -1,5 +1,5 @@
 import { AssetFormView } from '../views/AssetFormView.js';
-import { AssetEntity } from '../../business/models/AssetEntity.js';
+import { AssetEntity } from '../../domain/entities/AssetEntity.js';
 import { AssetCalculator } from '../../business/models/AssetCalculator.js';
 import { AssetFormValidator } from '../../business/validators/AssetFormValidator.js';
 

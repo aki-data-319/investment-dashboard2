@@ -1,4 +1,4 @@
-import { AssetEntity } from './AssetEntity.js';
+import { AssetEntity } from '../../domain/entities/AssetEntity.js';
 
 /**
  * AssetCalculator - 投資資産の計算・分析エンジン

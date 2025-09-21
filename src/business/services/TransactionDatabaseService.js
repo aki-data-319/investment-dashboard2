@@ -36,71 +36,9 @@ class TransactionDatabaseService {
                 return Array.from(this.transactionCache.values());
             }
 
-            const transactions = [];
-
-            // DataStoreManagerから全アセットデータを取得
-            const allAssets = this.dataStoreManager.getAllAssets();
-            
-            // 投資信託の処理
-            if (allAssets.mutualFunds && allAssets.mutualFunds.length > 0) {
-                allAssets.mutualFunds.forEach(mf => {
-                    transactions.push({
-                        id: mf.id,
-                        date: this.formatDate(mf.createdAt || mf.date || new Date().toISOString()),
-                        name: mf.name,
-                        type: 'mutualFund',
-                        quantity: '-',
-                        unitPrice: '-',
-                        amount: parseFloat(mf.amount) || 0,
-                        region: 'JP',
-                        currency: 'JPY',
-                        account: '特定',
-                        monthlyAmount: mf.monthlyAmount || null,
-                        source: 'manual'
-                    });
-                });
-            }
-
-            // 個別株の処理
-            if (allAssets.stocks && allAssets.stocks.length > 0) {
-                allAssets.stocks.forEach(stock => {
-                    transactions.push({
-                        id: stock.id,
-                        date: this.formatDate(stock.createdAt || stock.date || new Date().toISOString()),
-                        name: stock.name,
-                        ticker: stock.ticker || stock.code,
-                        type: 'stock',
-                        quantity: parseFloat(stock.quantity) || 0,
-                        unitPrice: parseFloat(stock.unitPrice) || 0,
-                        amount: parseFloat(stock.amount) || 0,
-                        region: stock.region || 'JP',
-                        currency: stock.settlementCurrency || 'JPY',
-                        account: stock.account || '特定',
-                        sector: stock.sector || 'その他',
-                        market: stock.market || '',
-                        source: stock.source || 'manual'
-                    });
-                });
-            }
-
-            // 仮想通貨の処理
-            if (allAssets.cryptoAssets && allAssets.cryptoAssets.length > 0) {
-                allAssets.cryptoAssets.forEach(crypto => {
-                    transactions.push({
-                        id: crypto.id,
-                        date: this.formatDate(crypto.createdAt || crypto.date || new Date().toISOString()),
-                        name: crypto.name,
-                        ticker: crypto.symbol,
-                        type: 'crypto',
-                        quantity: parseFloat(crypto.quantity) || 0,
-                        unitPrice: parseFloat(crypto.unitPrice) || 0,
-                        amount: parseFloat(crypto.amount) || 0,
-                        region: 'Global',
-                        currency: 'JPY',
-                        source: 'manual'
-                    });
-                });
-            }
+            // v3: canonical transactions をDataStoreから直接読み込み
+            const rows = this.dataStoreManager.load('investment-transactions') || [];
+            const transactions = rows.map((e) => this.mapEntityToLegacyDto(e));
 
             // 日付順にソート（最新が先頭）
             transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -111,9 +49,42 @@ class TransactionDatabaseService {
             return transactions;
 
         } catch (error) {
-            console.error('Failed to get all transactions:', error);
+            console.error('[TransactionDatabaseService.js] getAllTransactions エラー:', error?.message || error);
             return [];
         }
+    }
+
+    /**
+     * v3エンティティ → 旧テーブルDTOへ射影
+     */
+    mapEntityToLegacyDto(e) {
+        const typeMap = (sub) => {
+            if (sub === 'jp_equity' || sub === 'us_equity') return 'stock';
+            if (sub === 'mutual_fund') return 'mutualFund';
+            return 'other';
+        };
+        const regionFromSubtype = (sub) => {
+            if (sub === 'jp_equity') return 'JP';
+            if (sub === 'us_equity') return 'US';
+            if (sub === 'mutual_fund') return 'JP';
+            return 'OTHER';
+        };
+        return {
+            id: e.fingerprint || `${e.source}-${e.tradeDate}-${e.name}`,
+            date: this.formatDate(e.tradeDate || e.settleDate || new Date().toISOString()),
+            name: e.name || e.symbol || '-',
+            ticker: e.symbol || '',
+            type: typeMap(e.subtype),
+            quantity: typeof e.quantity === 'number' ? e.quantity : parseFloat(e.quantity || 0),
+            unitPrice: typeof e.price === 'number' ? e.price : parseFloat(e.price || 0),
+            amount: typeof e.settledAmount === 'number' ? Math.abs(e.settledAmount) : Math.abs(parseFloat(e.settledAmount || 0)),
+            region: e.market || regionFromSubtype(e.subtype),
+            currency: e.settledCurrency || e.currency || 'JPY',
+            account: e.accountType || '',
+            sector: e.sector || '',
+            market: e.market || '',
+            source: e.source || 'rakuten'
+        };
     }
 
     /**

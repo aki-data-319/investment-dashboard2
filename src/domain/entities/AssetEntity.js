@@ -379,34 +379,20 @@ export class AssetEntity {
         };
     }
 
-    // ========================================
-    // フォーム専用静的メソッド（Business Layer強化）
-    // ========================================
-
     /**
-     * フォームデータから資産インスタンスを作成
-     * @description フォーム入力データを受け取り、ビジネスルールを適用して新しい資産インスタンスを作成します
-     * @param {Object} formData - フォームから送信されたデータ
-     * @param {string} formData.name - 投資信託名
-     * @param {string} formData.type - 資産タイプ
-     * @param {number} formData.totalInvestment - 総投資額
-     * @param {number} [formData.currentValue] - 現在価値（未設定時は総投資額と同じ）
-     * @param {number} [formData.quantity] - 保有数量
-     * @param {string} [formData.region] - 地域
-     * @param {string} [formData.currency] - 通貨
-     * @param {string} [formData.sector] - セクター
-     * @param {string} [formData.description] - 説明
-     * @returns {AssetEntity} 新しく作成された資産インスタンス
-     * @throws {Error} フォームデータが無効な場合
-     * @static
-     * @example
-     * const formData = {
-     *   name: 'eMAXIS Slim 全世界株式',
-     *   type: 'mutualFund',
-     *   totalInvestment: 100000,
-     *   region: 'OTHER'
-     * };
-     * const assetEntity = AssetEntity.createFromForm(formData);
+     * フォームデータからエンティティを作成（ビジネスルール適用込み）
+     * @param {Object} formData
+     * @param {string} formData.name
+     * @param {string} formData.type
+     * @param {number} formData.totalInvestment
+     * @param {number} [formData.currentValue]
+     * @param {number} [formData.quantity]
+     * @param {string} [formData.region]
+     * @param {string} [formData.currency]
+     * @param {string} [formData.sector]
+     * @param {string} [formData.description]
+     * @returns {AssetEntity}
+     * @throws {Error}
      */
     static createFromForm(formData) {
         console.log('🏭 Creating AssetEntity from form data:', formData);
@@ -560,3 +546,4 @@ export class AssetEntity {
 
 // デフォルトエクスポート
 export default AssetEntity;
+

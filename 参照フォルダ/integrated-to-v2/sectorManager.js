@@ -1,36 +1,13 @@
 /**
- * SectorService - セクター管理・分析サービス
- * @description 株式銘柄のセクター分類、ポートフォリオ分析、集中リスク計算を提供
- * @author Investment Dashboard v2 Team
- * @version 2.0.0
- * @updated 2025-09-21 - 参照フォルダsectorManager.js統合
- * 
- * 統合元: 参照フォルダ/services-データ保存の基盤について/sectorManager.js
- * 配置: src/business/services/ (Business Layer)
- * 
- * 【主要機能】
- * - 東証33業種・GICS分類による自動セクター付与
- * - カスタムセクターマッピング（ユーザー設定）
- * - ポートフォリオ分散度分析・集中リスク計算
- * - 地域×セクターマトリックス分析
- * - HHI指数による定量的リスク評価
+ * セクター管理サービス
+ * 株式銘柄にセクター情報を付与し、セクター分析機能を提供
  */
 
-export class SectorService {
-    /**
-     * SectorServiceコンストラクタ
-     * @description セクター分類マスターデータとカスタム設定を初期化
-     * @param {Object} [options={}] - 初期化オプション
-     * @param {boolean} [options.debugMode=true] - デバッグモード
-     * @param {Object} [options.customMappings=null] - カスタムセクターマッピング
-     * @example
-     * const sectorService = new SectorService({ debugMode: false });
-     * const stockWithSector = sectorService.assignSector(stock);
-     */
-    constructor(options = {}) {
-        this.debugMode = options.debugMode !== false; // デフォルトtrue
+class SectorManager {
+    constructor() {
+        this.debugMode = true;
         
-        // セクター分類マスターデータ（東証33業種 + GICS分類）
+        // セクター分類マスターデータ
         this.sectorMaster = {
             // 日本株セクター（東証33業種分類ベース）
             JP: {
@@ -52,7 +29,6 @@ export class SectorService {
                 '7003': { sector: '輸送用機器', subSector: '輸送用機器' },
                 '7201': { sector: '自動車', subSector: '自動車' },
                 '7202': { sector: 'トヨタ自動車', subSector: '自動車' },
-                '7203': { sector: 'トヨタ自動車', subSector: '自動車' },
                 '7267': { sector: 'ホンダ', subSector: '自動車' },
                 '7751': { sector: 'キヤノン', subSector: '精密機器' },
                 '8001': { sector: '卸売業', subSector: '商社・卸売' },
@@ -97,60 +73,19 @@ export class SectorService {
         };
 
         // カスタムセクター設定（ユーザー定義）
-        this.customSectorMappings = options.customMappings || this.loadCustomMappings();
+        this.customSectorMappings = this.loadCustomMappings();
     }
 
-    /**
-     * デバッグログ出力
-     * @description デバッグ用ログ出力機能
-     * @param {string} message - ログメッセージ
-     * @param {*} [data=null] - 追加データ
-     * @returns {void}
-     * @example
-     * service.debugLog('セクター付与完了', { sector: 'Technology' });
-     */
     debugLog(message, data = null) {
         if (this.debugMode) {
-            console.log(`[SectorService] ${message}`, data || '');
+            console.log(`[SectorManager] ${message}`, data || '');
         }
     }
 
     /**
-     * 資産にセクター情報を付与（v2互換API）
-     * @description 既存のassignSectorメソッドと互換性を保ちつつ高機能化
-     * @param {Object} asset - 資産オブジェクト
-     * @param {string} [asset.name] - 資産名
-     * @param {string} [asset.symbol] - ティッカーシンボル
-     * @param {string} [asset.code] - 銘柄コード
-     * @param {string} [asset.region] - 地域（JP/US）
-     * @param {string} [asset.sector] - 既存セクター（設定済みの場合）
-     * @returns {Object} セクター情報付きの資産オブジェクト
-     * @example
-     * const asset = { name: 'Apple Inc.', symbol: 'AAPL', region: 'US' };
-     * const result = service.assignSector(asset);
-     * // { name: 'Apple Inc.', symbol: 'AAPL', region: 'US', sector: 'Technology', ... }
-     */
-    assignSector(asset) {
-        if (!asset) return asset;
-        if (asset.sector) return asset; // 既に設定済みなら維持
-
-        return this.assignSectorToStock(asset);
-    }
-
-    /**
-     * 株式にセクター情報を付与（詳細版）
-     * @description 株式データに東証33業種またはGICS分類を基にセクター情報を付与
+     * 株式にセクター情報を付与
      * @param {Object} stock - 株式データ
-     * @param {string} stock.name - 銘柄名
-     * @param {string} [stock.ticker] - ティッカーシンボル
-     * @param {string} [stock.code] - 銘柄コード
-     * @param {string} [stock.region='JP'] - 地域（JP/US）
      * @returns {Object} セクター情報付き株式データ
-     * @throws {Error} セクター付与処理でエラーが発生した場合
-     * @example
-     * const stock = { name: 'トヨタ自動車', code: '7203', region: 'JP' };
-     * const result = service.assignSectorToStock(stock);
-     * // { ..., sector: '自動車', subSector: '自動車', sectorSource: 'master' }
      */
     assignSectorToStock(stock) {
         try {
@@ -199,42 +134,82 @@ export class SectorService {
     }
 
     /**
-     * セクター別集計（v2互換API）
-     * @description 既存のaggregateBySectorメソッドと互換性を保持
-     * @param {Array<Object>} assets - 資産配列
-     * @param {number} [assets[].currentValue] - 現在価値
-     * @param {string} [assets[].sector] - セクター
-     * @returns {Object} セクター別集計結果
-     * @example
-     * const aggregation = service.aggregateBySector(assets);
-     * // { 'Technology': { count: 3, totalValue: 150000 }, ... }
+     * ポートフォリオ全体にセクター情報を付与
+     * @param {Array} holdings - 保有銘柄一覧
+     * @returns {Array} セクター情報付き保有銘柄一覧
      */
-    aggregateBySector(assets = []) {
-        const agg = {};
-        assets.forEach((a) => {
-            const key = a.sector || 'その他';
-            if (!agg[key]) agg[key] = { count: 0, totalValue: 0 };
-            agg[key].count += 1;
-            agg[key].totalValue += Number(a.currentValue || 0);
-        });
-        return agg;
+    assignSectorsToPortfolio(holdings) {
+        this.debugLog('=== ポートフォリオセクター付与開始 ===');
+        this.debugLog('対象銘柄数:', holdings.length);
+
+        const result = holdings.map(holding => this.assignSectorToStock(holding));
+        
+        const stats = this.calculateSectorStats(result);
+        this.debugLog('セクター付与完了:', stats);
+
+        return result;
     }
 
     /**
-     * ポートフォリオ全体セクター分析
-     * @description ポートフォリオの詳細なセクター分析を実行
-     * @param {Array<Object>} holdings - 保有銘柄一覧
-     * @returns {Object} 詳細セクター分析結果
-     * @throws {Error} 分析処理でエラーが発生した場合
-     * @example
-     * const analysis = service.generateSectorAnalysis(holdings);
-     * // { success: true, sectors: {...}, diversification: {...}, ... }
+     * セクター統計を計算
+     * @param {Array} sectorsAssignedHoldings - セクター情報付き保有銘柄
+     * @returns {Object} セクター統計
      */
-    generateSectorAnalysis(holdings) {
+    calculateSectorStats(sectorsAssignedHoldings) {
+        const stats = {
+            totalHoldings: sectorsAssignedHoldings.length,
+            sectorsFound: 0,
+            sectorsNotFound: 0,
+            customMapped: 0,
+            sectorBreakdown: {},
+            valueBySource: {
+                master: 0,
+                custom: 0,
+                default: 0,
+                error: 0
+            }
+        };
+
+        for (const holding of sectorsAssignedHoldings) {
+            // ソース別統計
+            if (holding.sectorSource === 'custom') stats.customMapped++;
+            if (holding.sectorSource === 'master') stats.sectorsFound++;
+            if (holding.sectorSource === 'default' || holding.sectorSource === 'error') {
+                stats.sectorsNotFound++;
+            }
+
+            // セクター別統計
+            const sector = holding.sector || 'その他';
+            if (!stats.sectorBreakdown[sector]) {
+                stats.sectorBreakdown[sector] = {
+                    count: 0,
+                    totalValue: 0,
+                    holdings: []
+                };
+            }
+            
+            stats.sectorBreakdown[sector].count++;
+            stats.sectorBreakdown[sector].totalValue += holding.currentValue || 0;
+            stats.sectorBreakdown[sector].holdings.push({
+                name: holding.name,
+                ticker: holding.ticker || holding.code,
+                value: holding.currentValue || 0
+            });
+
+            // ソース別価値統計
+            stats.valueBySource[holding.sectorSource] += holding.currentValue || 0;
+        }
+
+        return stats;
+    }
+
+    /**
+     * セクター分析結果を生成
+     * @param {Array} sectorsAssignedHoldings - セクター情報付き保有銘柄
+     * @returns {Object} セクター分析結果
+     */
+    generateSectorAnalysis(sectorsAssignedHoldings) {
         this.debugLog('=== セクター分析開始 ===');
-        
-        // セクター付与
-        const sectorsAssignedHoldings = holdings.map(holding => this.assignSectorToStock(holding));
         
         const stats = this.calculateSectorStats(sectorsAssignedHoldings);
         const totalPortfolioValue = sectorsAssignedHoldings.reduce(
@@ -289,66 +264,9 @@ export class SectorService {
     }
 
     /**
-     * セクター統計計算
-     * @description セクター別の詳細統計を計算
-     * @param {Array<Object>} sectorsAssignedHoldings - セクター情報付き保有銘柄
-     * @returns {Object} セクター統計
-     * @private
-     */
-    calculateSectorStats(sectorsAssignedHoldings) {
-        const stats = {
-            totalHoldings: sectorsAssignedHoldings.length,
-            sectorsFound: 0,
-            sectorsNotFound: 0,
-            customMapped: 0,
-            sectorBreakdown: {},
-            valueBySource: {
-                master: 0,
-                custom: 0,
-                default: 0,
-                error: 0
-            }
-        };
-
-        for (const holding of sectorsAssignedHoldings) {
-            // ソース別統計
-            if (holding.sectorSource === 'custom') stats.customMapped++;
-            if (holding.sectorSource === 'master') stats.sectorsFound++;
-            if (holding.sectorSource === 'default' || holding.sectorSource === 'error') {
-                stats.sectorsNotFound++;
-            }
-
-            // セクター別統計
-            const sector = holding.sector || 'その他';
-            if (!stats.sectorBreakdown[sector]) {
-                stats.sectorBreakdown[sector] = {
-                    count: 0,
-                    totalValue: 0,
-                    holdings: []
-                };
-            }
-            
-            stats.sectorBreakdown[sector].count++;
-            stats.sectorBreakdown[sector].totalValue += holding.currentValue || 0;
-            stats.sectorBreakdown[sector].holdings.push({
-                name: holding.name,
-                ticker: holding.ticker || holding.code,
-                value: holding.currentValue || 0
-            });
-
-            // ソース別価値統計
-            stats.valueBySource[holding.sectorSource] += holding.currentValue || 0;
-        }
-
-        return stats;
-    }
-
-    /**
      * 地域×セクターマトリックス生成
-     * @description 地域とセクターの組み合わせ分析
-     * @param {Array<Object>} sectorsAssignedHoldings - セクター情報付き保有銘柄
+     * @param {Array} sectorsAssignedHoldings - セクター情報付き保有銘柄
      * @returns {Object} 地域×セクターマトリックス
-     * @private
      */
     generateRegionSectorMatrix(sectorsAssignedHoldings) {
         const matrix = {};
@@ -382,12 +300,8 @@ export class SectorService {
 
     /**
      * 集中リスク計算（HHI指数）
-     * @description ハーフィンダール・ハーシュマン指数による集中リスク計算
-     * @param {Array<Object>} sectorAllocation - セクター配分
+     * @param {Array} sectorAllocation - セクター配分
      * @returns {Object} 集中リスク指標
-     * @example
-     * const risk = service.calculateConcentrationRisk(allocation);
-     * // { hhi: 1200, riskLevel: '低', interpretation: '良好な分散投資です' }
      */
     calculateConcentrationRisk(sectorAllocation) {
         // HHI（ハーフィンダール・ハーシュマン指数）計算
@@ -409,15 +323,11 @@ export class SectorService {
     }
 
     /**
-     * カスタムセクター設定更新
-     * @description ユーザー定義のセクターマッピングを更新
+     * カスタムセクター設定を更新
      * @param {string} region - 地域（JP/US）
      * @param {string} identifier - 銘柄コード/ティッカー
      * @param {string} sector - セクター名
      * @param {string} subSector - サブセクター名
-     * @returns {void}
-     * @example
-     * service.updateSectorMapping('JP', '7203', 'カスタム自動車', 'トヨタ特化');
      */
     updateSectorMapping(region, identifier, sector, subSector) {
         const key = `${region}_${identifier}`;
@@ -433,13 +343,9 @@ export class SectorService {
     }
 
     /**
-     * カスタムセクター設定削除
-     * @description ユーザー定義のセクターマッピングを削除
+     * カスタムセクター設定を削除
      * @param {string} region - 地域
      * @param {string} identifier - 銘柄コード/ティッカー
-     * @returns {void}
-     * @example
-     * service.removeSectorMapping('JP', '7203');
      */
     removeSectorMapping(region, identifier) {
         const key = `${region}_${identifier}`;
@@ -449,10 +355,7 @@ export class SectorService {
     }
 
     /**
-     * カスタム設定LocalStorage読み込み
-     * @description LocalStorageからカスタムセクター設定を読み込み
-     * @returns {Object} カスタムセクターマッピング
-     * @private
+     * カスタム設定をLocalStorageから読み込み
      */
     loadCustomMappings() {
         try {
@@ -465,10 +368,7 @@ export class SectorService {
     }
 
     /**
-     * カスタム設定LocalStorage保存
-     * @description カスタムセクター設定をLocalStorageに保存
-     * @returns {void}
-     * @private
+     * カスタム設定をLocalStorageに保存
      */
     saveCustomMappings() {
         try {
@@ -480,13 +380,9 @@ export class SectorService {
     }
 
     /**
-     * 利用可能セクター一覧取得
-     * @description 指定地域で利用可能なセクター一覧を取得
-     * @param {string} [region='JP'] - 地域（JP/US）
-     * @returns {Array<string>} セクター名配列
-     * @example
-     * const sectors = service.getAvailableSectors('US');
-     * // ['Technology', 'Health Care', 'Financials', ...]
+     * 利用可能なセクター一覧を取得
+     * @param {string} region - 地域
+     * @returns {Array} セクター一覧
      */
     getAvailableSectors(region = 'JP') {
         const masterSectors = region === 'JP' ? [
@@ -511,49 +407,19 @@ export class SectorService {
     }
 
     /**
-     * デバッグモード設定
-     * @description デバッグログ出力の有効/無効を切り替え
-     * @param {boolean} enabled - デバッグモード有効フラグ
-     * @returns {void}
-     * @example
-     * service.setDebugMode(false); // 本番環境でログを無効化
+     * デバッグモードの切り替え
      */
     setDebugMode(enabled) {
         this.debugMode = enabled;
         this.debugLog('デバッグモード変更:', enabled ? 'ON' : 'OFF');
     }
-
-    /**
-     * サービスバージョン情報取得
-     * @description SectorServiceのバージョン情報を取得
-     * @returns {Object} バージョン情報オブジェクト
-     * @static
-     * @example
-     * const version = SectorService.getVersion();
-     * // { version: '2.0.0', build: '2025-09-21', features: [...] }
-     */
-    static getVersion() {
-        return {
-            version: '2.0.0',
-            build: '2025-09-21',
-            architecture: 'v2-business-layer',
-            features: [
-                '東証33業種・GICS分類対応',
-                'カスタムセクターマッピング',
-                'HHI指数集中リスク計算',
-                '地域×セクターマトリックス',
-                'ポートフォリオ分散度分析'
-            ]
-        };
-    }
 }
 
-// ES6モジュールエクスポート（v2アーキテクチャ対応）
-export default SectorService;
+// グローバルインスタンス作成
+const sectorManager = new SectorManager();
 
-// グローバルエクスポート（従来の互換性保持）
+// windowオブジェクトにも追加
 if (typeof window !== 'undefined') {
-    window.SectorService = SectorService;
-    console.log('✅ SectorService v2統合版がグローバルスコープに登録されました');
+    window.sectorManager = sectorManager;
+    console.log('✅ セクター管理サービスが利用可能です');
 }
-

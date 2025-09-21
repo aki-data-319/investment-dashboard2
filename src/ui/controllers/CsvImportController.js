@@ -45,20 +45,21 @@ class CsvImportController {
         this.view.showPreview(preview);
         this.view.hideLoading('プレビュー完了');
       } catch (e) {
-        console.error(e);
+        console.error('[CsvImportController.js] onParse エラー:', e?.message || e);
         this.view.hideLoading('解析に失敗しました');
       }
     });
 
     this.view.onImport(async (options) => {
-      if (!this.lastPreview || !Array.isArray(this.lastPreview.transactions)) {
-        this.view.hideLoading('先にプレビューを実行してください');
+      if (!this.currentFile) {
+        this.view.hideLoading('CSVファイルを選択してください');
         return;
       }
       try {
         this.view.showLoading('インポート中...');
-        const result = await this.service.importTransactions(this.lastPreview.transactions, options);
-        this.view.showResult(result);
+        const { upsert } = await this.service.parseAndImport(this.currentFile, null, null, options);
+        const resultForView = { imported: upsert.inserted || 0, skipped: upsert.skipped || 0, errors: [] };
+        this.view.showResult(resultForView);
         this.view.hideLoading(options?.dryRun ? 'ドライラン完了' : 'インポート完了');
 
         // 実インポート時はダッシュボードを更新
@@ -66,7 +67,7 @@ class CsvImportController {
           await this.dashboardController.refreshData();
         }
       } catch (e) {
-        console.error(e);
+        console.error('[CsvImportController.js] onImport エラー:', e?.message || e);
         this.view.hideLoading('インポートに失敗しました');
       }
     });
@@ -79,4 +80,3 @@ class CsvImportController {
 
 export { CsvImportController };
 export default CsvImportController;
-

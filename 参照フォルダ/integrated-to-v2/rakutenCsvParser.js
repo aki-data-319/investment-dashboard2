@@ -1,31 +1,9 @@
 /**
- * RakutenCsvParser - 楽天証券CSV解析エンジン
- * @description 楽天証券の日本株・米国株・投資信託CSVを統一形式に変換する高機能パーサー
- * @author Investment Dashboard v2 Team
- * @version 2.0.0
- * @created 2025-09-21
- * 
- * 統合元: 参照フォルダ/services-データ保存の基盤について/rakutenCsvParser.js
- * 配置: src/infrastructure/parsers/ (Infrastructure Layer)
- * 
- * 【主要機能】
- * - Shift-JIS正常読み込み（文字化け完全対策）
- * - 3つのCSV形式対応（JP株・US株・投資信託）
- * - 柔軟な列名検索（エンコーディング差異対応）
- * - 統一データ形式への変換
- * - 詳細なデバッグ・ログ機能
+ * 楽天証券CSVパーサー - Shift-JIS正常読み込み版
+ * 文字化けを前提とせず、正しいエンコーディングで読み込む
  */
 
-import { TransactionEntity } from '../../domain/entities/TransactionEntity.js';
-
-export class RakutenCsvParser {
-    /**
-     * RakutenCsvParserコンストラクタ
-     * @description 楽天証券CSV形式のメタデータとパーサー設定を初期化
-     * @example
-     * const parser = new RakutenCsvParser();
-     * const result = await parser.parseCsvFile(file, 'JP');
-     */
+class RakutenCsvParser {
     constructor() {
         this.headersLogged = false; // ヘッダーログ出力フラグ
         
@@ -83,15 +61,6 @@ export class RakutenCsvParser {
         this.debugMode = true;
     }
 
-    /**
-     * デバッグログ出力
-     * @description 開発・デバッグ用のログ出力機能
-     * @param {string} message - ログメッセージ
-     * @param {*} [data=null] - 追加データ（オプション）
-     * @returns {void}
-     * @example
-     * parser.debugLog('CSVファイル処理開始', { fileName: 'trade.csv' });
-     */
     debugLog(message, data = null) {
         if (this.debugMode) {
             console.log(`[RakutenCsvParser] ${message}`, data || '');
@@ -99,15 +68,10 @@ export class RakutenCsvParser {
     }
 
     /**
-     * 柔軟な列名検索
-     * @description エンコーディングや空白文字の違いを考慮した列値検索
+     * 柔軟な列名検索（空白文字やエンコーディングの違いを考慮）
      * @param {Object} row - CSV行データ
-     * @param {Array<string>} columnNames - 検索する列名の配列（優先順）
+     * @param {Array} columnNames - 検索する列名の配列（優先順）
      * @returns {string|null} 見つかった値またはnull
-     * @throws {Error} 検索対象データが無効な場合
-     * @example
-     * const value = parser.findColumnValue(row, ['売買区分', '取引区分', '取引']);
-     * // '買付' または '売却' などの値を取得
      */
     findColumnValue(row, columnNames) {
         for (const colName of columnNames) {
@@ -129,14 +93,9 @@ export class RakutenCsvParser {
     }
 
     /**
-     * CSVファイル正常エンコーディング読み込み
-     * @description Shift-JIS、UTF-8、ISO-8859-1を順次試行して正常読み込みを実現
-     * @param {File} file - 読み込み対象のCSVファイル
+     * CSVファイルを正しいエンコーディングで読み込み
+     * @param {File} file - CSVファイル
      * @returns {Promise<string>} 正常に読み込まれたCSVテキスト
-     * @throws {Error} 全エンコーディングで読み込み失敗時
-     * @example
-     * const csvText = await parser.readCsvFileWithProperEncoding(file);
-     * // 日本語が正常に読み込まれたCSVテキストを取得
      */
     async readCsvFileWithProperEncoding(file) {
         const encodings = ['Shift_JIS', 'UTF-8', 'ISO-8859-1'];
@@ -180,13 +139,9 @@ export class RakutenCsvParser {
     }
 
     /**
-     * 正常な日本語検証
-     * @description テキストに正常な日本語（投資関連用語）が含まれているかを検証
-     * @param {string} text - 検証対象テキスト
+     * 正常な日本語が含まれているかチェック
+     * @param {string} text - チェックするテキスト
      * @returns {boolean} 正常な日本語が含まれている場合true
-     * @example
-     * const isValid = parser.containsValidJapanese('約定日,銘柄名,売買区分');
-     * // true（投資用語が含まれている）
      */
     containsValidJapanese(text) {
         // ひらがな、カタカナ、漢字の範囲をチェック
@@ -206,19 +161,13 @@ export class RakutenCsvParser {
         return foundTerms.length > 0;
     }
 
+
     /**
-     * CSVファイル解析メイン処理
-     * @description 楽天証券CSVファイルを解析し、標準形式のデータに変換
-     * @param {File} file - 解析対象のCSVファイル
-     * @param {string} csvType - CSV形式（'JP'|'US'|'INVST'）
-     * @param {function} [progressCallback=null] - 進捗コールバック関数
-     * @returns {Promise<Object>} 解析結果オブジェクト
-     * @throws {Error} ファイル読み込み失敗、形式不正等
-     * @example
-     * const result = await parser.parseCsvFile(file, 'JP', (progress, message) => {
-     *   console.log(`${progress}%: ${message}`);
-     * });
-     * // { success: true, data: [...], csvType: 'JP', ... }
+     * CSVファイルをパースして標準形式に変換（指定された形式を使用）
+     * @param {File} file - CSVファイル
+     * @param {string} csvType - 手動で指定されたCSV形式（JP/US/INVST）
+     * @param {function} progressCallback - 進捗コールバック関数
+     * @returns {Promise<Object>} パース結果
      */
     async parseCsvFile(file, csvType, progressCallback = null) {
         try {
@@ -244,7 +193,6 @@ export class RakutenCsvParser {
 
             if (parseResult.errors.length > 0) {
                 this.debugLog('⚠️ CSV解析警告:', parseResult.errors);
-                console.warn('[RakutenCsvParser.js] PapaParse 警告', parseResult.errors);
             }
 
             this.debugLog('Papa Parse結果:', {
@@ -252,24 +200,21 @@ export class RakutenCsvParser {
                 fields: parseResult.meta.fields
             });
 
-            if (progressCallback) progressCallback(70, 'エンティティへ正規化中...');
-            // 3. v3: TransactionEntityへ正規化
-            let transactionEntities = [];
-            try {
-                transactionEntities = this.convertRowsToTransactionEntities(parseResult.data, csvType);
-            } catch (e) {
-                console.error('[RakutenCsvParser.js] convertRowsToTransactionEntities エラー:', e?.message || e);
-                throw e;
-            }
-            this.debugLog('正規化済みエンティティ行数:', transactionEntities.length);
-            if (progressCallback) progressCallback(90, '正規化完了...');
+            if (progressCallback) progressCallback(70, 'データを変換中...');
+            
+            // 3. データ変換（指定された形式を使用）
+            const convertedData = this.convertToStandardFormat(parseResult.data, csvType);
+            this.debugLog('変換済みデータ行数:', convertedData.length);
+            
+            if (progressCallback) progressCallback(90, '変換完了...');
 
             const result = {
                 success: true,
                 csvType: csvType,
                 description: this.csvFormats[csvType].description,
                 originalRows: parseResult.data.length,
-                convertedRows: transactionEntities.length,
+                convertedRows: convertedData.length,
+                data: convertedData,
                 fileName: file.name,
                 fileSize: file.size,
                 parseDate: new Date().toISOString(),
@@ -280,12 +225,6 @@ export class RakutenCsvParser {
                     encodingSuccess: true
                 }
             };
-            // v3専用出力
-            result.entities = transactionEntities;
-            result.v3 = {
-                totalCount: transactionEntities.length,
-                validCount: transactionEntities.length,
-            };
 
             if (progressCallback) progressCallback(100, '完了');
             this.debugLog('✅ CSVファイル処理完了 - 形式:', csvType);
@@ -294,7 +233,6 @@ export class RakutenCsvParser {
 
         } catch (error) {
             this.debugLog('❌ CSVファイル処理エラー:', error);
-            console.error('[RakutenCsvParser.js] parseCsvFile エラー:', error?.message || error);
             return {
                 success: false,
                 error: error.message,
@@ -311,160 +249,10 @@ export class RakutenCsvParser {
     }
 
     /**
-     * v3: CSV行を TransactionEntity[] に変換
-     * @param {Array<object>} rows
-     * @param {'JP'|'US'|'INVST'} csvType
-     */
-    convertRowsToTransactionEntities(rows, csvType) {
-        const entities = [];
-        for (let i = 0; i < rows.length; i++) {
-            const row = rows[i];
-            try {
-                const ent = this.convertRowToTransactionEntity(row, csvType);
-                if (ent) entities.push(ent);
-            } catch (e) {
-                console.error(`[RakutenCsvParser.js] 行${i + 1} の正規化に失敗:`, e?.message || e);
-            }
-        }
-        return entities;
-    }
-
-    /**
-     * v3: 単一行を TransactionEntity に変換
-     */
-    convertRowToTransactionEntity(row, csvType) {
-        // 空行スキップ
-        const hasData = Object.values(row).some(v => v && v.toString().trim() !== '');
-        if (!hasData) return null;
-
-        const tradeTypeRaw = this.findColumnValue(row, ['売買区分', '取引区分', '取引']) || '';
-        const tradeType = (tradeTypeRaw || '').toString().trim().toLowerCase();
-        const buySell = this.normalizeTradeType(tradeTypeRaw);
-
-        const base = {
-            source: 'rakuten',
-            subtype: csvType === 'JP' ? 'jp_equity' : (csvType === 'US' ? 'us_equity' : 'mutual_fund'),
-            tradeDate: this.parseDate(this.findColumnValue(row, ['約定日', '取引日'])),
-            settleDate: this.parseDate(this.findColumnValue(row, ['受渡日'])),
-            symbol: null,
-            name: this.findColumnValue(row, ['銘柄名', 'ファンド名']) || '',
-            market: this.findColumnValue(row, ['市場名称']) || null,
-            accountType: this.findColumnValue(row, ['口座区分', '口座']) || null,
-            tradeType: tradeType,
-            marginType: this.findColumnValue(row, ['信用区分']) || null,
-            fee: 0,
-            tax: 0,
-            otherCosts: 0,
-            nisa: null,
-            remarks: null,
-        };
-
-        if (csvType === 'JP') {
-            const qty = this.parseQuantity(this.findColumnValue(row, ['数量［株］', '数量']) || '0');
-            const priceJpy = this.parseAmount(this.findColumnValue(row, ['単価［円］', '単価']) || '0');
-            const settledJpyAbs = this.parseAmount(this.findColumnValue(row, ['受渡金額［円］', '受渡金額']) || '0');
-            const fee = this.parseAmount(this.findColumnValue(row, ['手数料［円］', '手数料']) || '0');
-            const tax = this.parseAmount(this.findColumnValue(row, ['税金等［円］', '税金']) || '0');
-            const other = this.parseAmount(this.findColumnValue(row, ['諸費用［円］']) || '0');
-            const sign = TransactionEntity.expectedSignByTradeType(buySell) === 'negative' ? -1 : (TransactionEntity.expectedSignByTradeType(buySell) === 'positive' ? 1 : 1);
-            const settled = settledJpyAbs * sign;
-
-            return new TransactionEntity({
-                ...base,
-                symbol: this.findColumnValue(row, ['銘柄コード']) || null,
-                quantity: qty,
-                quantityUnit: '株',
-                price: priceJpy,
-                priceCurrency: 'JPY',
-                grossAmount: null,
-                grossCurrency: null,
-                fee, tax, otherCosts: other,
-                currency: 'JPY',
-                fxRate: 1,
-                settledAmount: settled,
-                settledCurrency: 'JPY',
-            });
-        }
-
-        if (csvType === 'US') {
-            const qty = this.parseQuantity(this.findColumnValue(row, ['数量［株］', '数量']) || '0');
-            const priceUsd = this.parseAmount(this.findColumnValue(row, ['単価［USドル］']) || '0');
-            const grossUsd = this.parseAmount(this.findColumnValue(row, ['約定代金［USドル］']) || '0');
-            const feeUsd = this.parseAmount(this.findColumnValue(row, ['手数料［USドル］']) || '0');
-            const taxUsd = this.parseAmount(this.findColumnValue(row, ['税金［USドル］']) || '0');
-            const fx = this.parseAmount(this.findColumnValue(row, ['為替レート']) || '0');
-            const settleCurRaw = this.findColumnValue(row, ['決済通貨']) || 'USドル';
-            const settleCur = this.normalizeCurrencyLabel(settleCurRaw);
-            const cashUsd = this.parseAmount(this.findColumnValue(row, ['受渡金額［USドル］']) || '0');
-            const cashJpy = this.parseAmount(this.findColumnValue(row, ['受渡金額［円］']) || '0');
-            const sign = TransactionEntity.expectedSignByTradeType(buySell) === 'negative' ? -1 : (TransactionEntity.expectedSignByTradeType(buySell) === 'positive' ? 1 : 1);
-            const settled = (settleCur === 'JPY' ? cashJpy : cashUsd) * sign;
-
-            return new TransactionEntity({
-                ...base,
-                symbol: this.findColumnValue(row, ['ティッカー']) || null,
-                quantity: qty,
-                quantityUnit: '株',
-                price: priceUsd,
-                priceCurrency: 'USD',
-                grossAmount: grossUsd,
-                grossCurrency: 'USD',
-                fee: feeUsd,
-                tax: taxUsd,
-                currency: settleCur,
-                fxRate: fx || null,
-                settledAmount: settled,
-                settledCurrency: settleCur,
-            });
-        }
-
-        if (csvType === 'INVST') {
-            const qty = this.parseQuantity(this.findColumnValue(row, ['数量［口］']) || '0');
-            const price = this.parseAmount(this.findColumnValue(row, ['単価']) || '0');
-            const fee = this.parseAmount(this.findColumnValue(row, ['経費']) || '0');
-            const fx = this.parseAmount(this.findColumnValue(row, ['為替レート']) || '0');
-            const settleCur = this.normalizeCurrencyLabel(this.findColumnValue(row, ['決済通貨']) || '円');
-            const cashJpy = this.parseAmount(this.findColumnValue(row, ['受渡金額/(ポイント利用)[円]']) || '0');
-            const sign = TransactionEntity.expectedSignByTradeType(buySell) === 'negative' ? -1 : (TransactionEntity.expectedSignByTradeType(buySell) === 'positive' ? 1 : 1);
-
-            return new TransactionEntity({
-                ...base,
-                quantity: qty,
-                quantityUnit: '口',
-                price: price,
-                priceCurrency: 'JPY',
-                grossAmount: null,
-                grossCurrency: null,
-                fee,
-                tax: 0,
-                currency: settleCur || 'JPY',
-                fxRate: fx || null,
-                settledAmount: (cashJpy * sign),
-                settledCurrency: 'JPY',
-            });
-        }
-        return null;
-    }
-
-    /**
-     * 日本語ラベルを通貨コードに正規化
-     */
-    normalizeCurrencyLabel(label) {
-        const t = (label || '').toString();
-        if (t.includes('円')) return 'JPY';
-        if (t.includes('USドル') || t.toUpperCase() === 'USD') return 'USD';
-        return t.trim().toUpperCase().slice(0, 3);
-    }
-
-    /**
-     * データ標準形式変換
-     * @description 楽天証券の生データを投資ダッシュボードの標準形式に変換
-     * @param {Array<Object>} rawData - Papa Parse結果データ
-     * @param {string} csvType - CSV形式（'JP'|'US'|'INVST'）
-     * @returns {Array<Object>} 標準形式変換済みデータ
-     * @example
-     * const standardData = parser.convertToStandardFormat(papaParseData, 'JP');
-     * // [{ date: '2025-01-01', name: 'Apple Inc.', ... }, ...]
+     * パースデータを標準形式に変換
+     * @param {Object[]} rawData - Papa Parse結果データ
+     * @param {string} csvType - CSV形式
+     * @returns {Object[]} 変換済みデータ
      */
     convertToStandardFormat(rawData, csvType) {
         this.debugLog('=== データ変換開始 ===');
@@ -498,15 +286,10 @@ export class RakutenCsvParser {
     }
 
     /**
-     * 単一行標準形式変換
-     * @description CSV1行を投資ダッシュボードの標準データ形式に変換
+     * 単一行を標準形式に変換
      * @param {Object} row - CSVの1行データ
-     * @param {string} csvType - CSV形式（'JP'|'US'|'INVST'）
-     * @returns {Object|null} 変換済みデータまたはnull（スキップ対象）
-     * @throws {Error} 必須フィールド不足、データ形式不正等
-     * @example
-     * const standardRow = parser.convertSingleRow(csvRow, 'JP');
-     * // { date: '2025-01-01', name: 'トヨタ', type: 'stock', ... }
+     * @param {string} csvType - CSV形式
+     * @returns {Object|null} 変換済みデータまたはnull
      */
     convertSingleRow(row, csvType) {
         // 空行チェック
@@ -535,6 +318,18 @@ export class RakutenCsvParser {
         const rawTradeType = tradeTypeColumn || '';
         const normalizedTradeType = this.normalizeTradeType(rawTradeType);
         
+        // デバッグログ追加（詳細版）
+        this.debugLog(`🔍 売買区分処理:`, {
+            銘柄名: row['銘柄名'] || row['ファンド名'] || '',
+            元の売買区分: rawTradeType,
+            正規化後: normalizedTradeType,
+            CSV形式: csvType,
+            '売買区分列の値': row['売買区分'],
+            '取引列の値': row['取引'],
+            約定日: row['約定日'],
+            利用可能列: Object.keys(row).filter(key => key.includes('売買') || key.includes('取引') || key.includes('約定'))
+        });
+        
         const baseData = {
             date: this.parseDate(this.findColumnValue(row, ['約定日', '取引日'])),
             name: this.findColumnValue(row, ['銘柄名', 'ファンド名']) || '',
@@ -557,18 +352,19 @@ export class RakutenCsvParser {
                     quantity: this.parseQuantity(this.findColumnValue(row, ['数量［株］', '数量']) || '0'),
                     unitPrice: unitPriceJp,
                     amount: amountJp,
-                    amountJpy: amountJp,
-                    unitPriceJpy: unitPriceJp,
+                    amountJpy: amountJp, // 🆕 円換算額（JP株はそのまま）
+                    unitPriceJpy: unitPriceJp, // 🆕 円換算単価（JP株はそのまま）
                     fee: this.parseAmount(this.findColumnValue(row, ['手数料［円］', '手数料']) || '0'),
                     account: this.findColumnValue(row, ['口座区分', '口座']) || '',
-                    settlementCurrency: '円',
-                    exchangeRate: 1,
+                    settlementCurrency: '円', // 🆕 JP株は常に円決済
+                    exchangeRate: 1, // 🆕 JP株は為替レート1
                     type: 'stock',
                     region: 'JP',
                     currency: 'JPY'
                 };
 
             case 'US':
+                // 決済通貨に応じた金額取得
                 const settlementCurrency = row['決済通貨'] || '';
                 const exchangeRate = this.parseAmount(row['為替レート'] || '1');
                 const unitPriceUsd = this.parseAmount(row['単価［USドル］'] || '0');
@@ -578,13 +374,16 @@ export class RakutenCsvParser {
                 let amount, amountJpy;
                 
                 if (settlementCurrency === '円') {
+                    // 円決済の場合：受渡金額［円］を使用
                     amount = amountJpyRaw;
                     amountJpy = amountJpyRaw;
                 } else {
+                    // USドル決済の場合：受渡金額［USドル］を使用
                     amount = amountUsd;
                     amountJpy = amountJpyRaw || (amountUsd * exchangeRate);
                 }
 
+                // 🆕 円換算単価を事前計算
                 const unitPriceJpy = unitPriceUsd * exchangeRate;
 
                 return {
@@ -594,7 +393,7 @@ export class RakutenCsvParser {
                     unitPrice: unitPriceUsd,
                     amount: amount,
                     amountJpy: amountJpy,
-                    unitPriceJpy: unitPriceJpy,
+                    unitPriceJpy: unitPriceJpy, // 🆕 円換算単価
                     fee: this.parseAmount(row['手数料［USドル］'] || '0'),
                     exchangeRate: exchangeRate,
                     settlementCurrency: settlementCurrency,
@@ -624,15 +423,7 @@ export class RakutenCsvParser {
         }
     }
 
-    /**
-     * 日付文字列解析
-     * @description 楽天証券の日付形式を標準ISO形式（YYYY-MM-DD）に変換
-     * @param {string} dateStr - 楽天証券日付文字列
-     * @returns {string} ISO形式日付文字列（YYYY-MM-DD）
-     * @example
-     * const isoDate = parser.parseDate('2025/01/15');
-     * // '2025-01-15'
-     */
+    // ユーティリティメソッド（既存のまま）
     parseDate(dateStr) {
         if (!dateStr) return new Date().toISOString().split('T')[0];
         
@@ -650,15 +441,6 @@ export class RakutenCsvParser {
         }
     }
 
-    /**
-     * 売買区分正規化
-     * @description 楽天証券の売買区分を標準形式（buy/sell/other）に正規化
-     * @param {string} tradeType - 楽天証券売買区分
-     * @returns {string} 正規化された売買区分（'buy'|'sell'|'other'）
-     * @example
-     * const normalized = parser.normalizeTradeType('現物買');
-     * // 'buy'
-     */
     normalizeTradeType(tradeType) {
         const normalized = tradeType.toLowerCase().trim();
         
@@ -671,15 +453,6 @@ export class RakutenCsvParser {
         }
     }
 
-    /**
-     * 金額文字列解析
-     * @description 楽天証券の金額文字列（円記号、コンマ含む）を数値に変換
-     * @param {string} amountStr - 楽天証券金額文字列
-     * @returns {number} 数値金額（負数は絶対値に変換）
-     * @example
-     * const amount = parser.parseAmount('¥1,234,567');
-     * // 1234567
-     */
     parseAmount(amountStr) {
         if (!amountStr) return 0;
         
@@ -689,15 +462,6 @@ export class RakutenCsvParser {
         return isNaN(number) ? 0 : Math.abs(number);
     }
 
-    /**
-     * 数量文字列解析
-     * @description 楽天証券の数量文字列（株数、口数）を数値に変換
-     * @param {string} quantityStr - 楽天証券数量文字列
-     * @returns {number} 数値数量（負数は絶対値に変換）
-     * @example
-     * const quantity = parser.parseQuantity('1,000');
-     * // 1000
-     */
     parseQuantity(quantityStr) {
         if (!quantityStr) return 0;
         
@@ -708,18 +472,10 @@ export class RakutenCsvParser {
     }
 
     /**
-     * 複数CSVファイル一括処理
-     * @description 複数の楽天証券CSVファイルを指定形式で一括処理
-     * @param {FileList} files - 処理対象ファイル一覧
-     * @param {string} csvType - 統一CSV形式（'JP'|'US'|'INVST'）
-     * @param {function} [progressCallback=null] - 進捗コールバック関数
-     * @returns {Promise<Array<Object>>} 各ファイルの処理結果配列
-     * @throws {Error} ファイル処理失敗時
-     * @example
-     * const results = await parser.parseMultipleCsvFiles(files, 'JP', 
-     *   (progress, message) => console.log(`${progress}%: ${message}`)
-     * );
-     * // [{ success: true, data: [...] }, { success: false, error: '...' }]
+     * 複数のCSVファイルを一括処理（指定された形式を使用）
+     * @param {FileList} files - 処理するファイル一覧
+     * @param {string} csvType - 指定されたCSV形式（JP/US/INVST）
+     * @param {function} progressCallback - 進捗コールバック関数
      */
     async parseMultipleCsvFiles(files, csvType, progressCallback = null) {
         this.debugLog('=== 複数ファイル処理開始 ===');
@@ -748,71 +504,19 @@ export class RakutenCsvParser {
     }
 
     /**
-     * デバッグモード設定
-     * @description デバッグログ出力の有効/無効を切り替え
-     * @param {boolean} enabled - デバッグモード有効フラグ
-     * @returns {void}
-     * @example
-     * parser.setDebugMode(false); // 本番環境でログを無効化
+     * デバッグモードの切り替え
      */
     setDebugMode(enabled) {
         this.debugMode = enabled;
         this.debugLog('デバッグモード変更:', enabled ? 'ON' : 'OFF');
     }
-
-    /**
-     * v3エンティティ出力モード切替
-     * @param {boolean} enabled
-     */
-    // v3専用のため切替フラグは不要
-
-    /**
-     * サポート済みCSV形式一覧取得
-     * @description パーサーがサポートするCSV形式の一覧を取得
-     * @returns {Array<Object>} サポート形式情報配列
-     * @static
-     * @example
-     * const formats = RakutenCsvParser.getSupportedFormats();
-     * // [{ key: 'JP', description: '日本株式取引履歴' }, ...]
-     */
-    static getSupportedFormats() {
-        return [
-            { key: 'JP', description: '日本株式取引履歴' },
-            { key: 'US', description: '米国株式取引履歴' },
-            { key: 'INVST', description: '投資信託取引履歴' }
-        ];
-    }
-
-    /**
-     * パーサーバージョン情報取得
-     * @description RakutenCsvParserのバージョン情報を取得
-     * @returns {Object} バージョン情報オブジェクト
-     * @static
-     * @example
-     * const version = RakutenCsvParser.getVersion();
-     * // { version: '2.0.0', build: '2025-09-21', features: [...] }
-     */
-    static getVersion() {
-        return {
-            version: '2.0.0',
-            build: '2025-09-21',
-            architecture: 'v2-infrastructure-layer',
-            features: [
-                'Shift-JIS正常読み込み',
-                '3つのCSV形式対応',
-                '柔軟な列名検索',
-                '統一データ形式変換',
-                '詳細デバッグ機能'
-            ]
-        };
-    }
 }
 
-// ES6モジュールエクスポート（v2アーキテクチャ対応）
-export default RakutenCsvParser;
+// グローバルインスタンス作成
+const rakutenCsvParser = new RakutenCsvParser();
 
-// グローバルエクスポート（従来の互換性保持）
+// windowオブジェクトにも追加
 if (typeof window !== 'undefined') {
-    window.RakutenCsvParser = RakutenCsvParser;
-    console.log('✅ RakutenCsvParser v2統合版がグローバルスコープに登録されました');
+    window.rakutenCsvParser = rakutenCsvParser;
+    console.log('✅ 楽天証券CSVパーサー（Shift-JIS正常読み込み版）が利用可能です');
 }

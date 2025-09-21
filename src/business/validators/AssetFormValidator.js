@@ -1,4 +1,4 @@
-import { AssetEntity } from '../models/AssetEntity.js';
+import { AssetEntity } from '../../domain/entities/AssetEntity.js';
 
 /**
  * AssetFormValidator - 投資信託追加フォーム専用バリデーター

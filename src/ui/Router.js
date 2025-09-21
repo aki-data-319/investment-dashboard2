@@ -1,7 +1,10 @@
 import { DashboardController } from './controllers/DashboardController.js';
 import { AssetFormController } from './controllers/AssetFormController.js';
 import { CsvImportController } from './controllers/CsvImportController.js';
-import { DatabaseController } from './controllers/DatabaseController.js';
+// DatabaseController はグローバル(window)経由で参照（非module読み込み両立のため）
+const DatabaseController = (typeof window !== 'undefined' && window.DatabaseController)
+  ? window.DatabaseController
+  : undefined;
 
 /**
  * Router - 統合ルーティング・ナビゲーション管理
@@ -343,13 +346,29 @@ export class Router {
                 mainContent.classList.add('view-visible');
             }
             
+            // 初期読み込みメッセージを確実に非表示にする
+            const loadingState = document.querySelector('.loading-state');
+            if (loadingState) {
+                loadingState.style.display = 'none';
+                console.log('🔄 Loading state hidden during view show');
+            }
+            
             // コントローラー固有の表示処理
             if (path === 'dashboard') {
-                // ダッシュボードの場合は初期化または更新
+                // ダッシュボードの場合は読み込みメッセージを一時的に表示してから初期化
+                if (loadingState) {
+                    loadingState.style.display = 'block';
+                }
+                
                 if (typeof controller.initialize === 'function') {
                     await controller.initialize(data);
                 } else if (typeof controller.refreshData === 'function') {
                     await controller.refreshData();
+                }
+                
+                // ダッシュボード初期化後、読み込みメッセージを非表示
+                if (loadingState) {
+                    loadingState.style.display = 'none';
                 }
             } else if (path === 'add-asset') {
                 // 資産追加フォームの場合は開く
@@ -363,7 +382,7 @@ export class Router {
                     controller.render();
                 }
             } else if (path === 'database') {
-                // データベース画面の場合は表示
+                // データベース画面の場合は表示（main-content内で動作）
                 if (typeof controller.showDatabase === 'function') {
                     controller.showDatabase(data);
                 } else if (typeof controller.initialize === 'function') {
@@ -405,12 +424,26 @@ export class Router {
                 }
             }
             
-            // データベース画面の場合は非表示処理
-            if (this.currentView === 'database') {
-                const databaseContainer = document.getElementById('databaseContainer');
-                if (databaseContainer) {
-                    databaseContainer.style.display = 'none';
-                }
+            // データベース画面の処理は main-content 統一管理により不要
+            // （DatabaseController が main-content 内で動作するため）
+            
+            // 初期読み込みメッセージを非表示にする
+            const loadingState = document.querySelector('.loading-state');
+            if (loadingState) {
+                loadingState.style.display = 'none';
+                console.log('🔄 Loading state hidden');
+            }
+            
+            // メインコンテンツエリアをクリア（必要に応じて）
+            const mainContent = document.querySelector('.main-content');
+            if (mainContent && this.currentView !== 'dashboard') {
+                // ダッシュボード以外の場合、前のビューの内容をクリア
+                const viewContainers = mainContent.querySelectorAll('.view-container:not(.loading-state)');
+                viewContainers.forEach(container => {
+                    if (container.id !== 'databaseContainer') {
+                        container.style.display = 'none';
+                    }
+                });
             }
             
             // ビューのクリーンアップ処理があれば実行

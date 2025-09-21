@@ -42,21 +42,15 @@ class DatabaseController {
      */
     showDatabase() {
         try {
-            // 他のページを非表示
-            this.hideAllPages();
-            
-            // データベースページコンテナを取得または作成
-            let databaseContainer = document.getElementById('databaseContainer');
-            if (!databaseContainer) {
-                databaseContainer = document.createElement('div');
-                databaseContainer.id = 'databaseContainer';
-                databaseContainer.className = 'page-container';
-                document.body.appendChild(databaseContainer);
+            // main-content コンテナを取得
+            const mainContent = document.getElementById('mainContent');
+            if (!mainContent) {
+                console.error('❌ Main content container not found');
+                return;
             }
-
-            // データベースページを表示
-            databaseContainer.innerHTML = this.view.render();
-            databaseContainer.style.display = 'block';
+            
+            // main-content内にデータベースコンテンツを描画
+            mainContent.innerHTML = this.view.render();
             
             // 初期化
             this.initialize();
@@ -64,7 +58,7 @@ class DatabaseController {
             // デフォルトで取引履歴タブを表示
             this.loadTransactionsTab();
             
-            console.log('Database page displayed successfully');
+            console.log('Database page displayed successfully in main-content');
         } catch (error) {
             console.error('Failed to show database page:', error);
             this.showMessage('データベースページの表示に失敗しました', 'error');
@@ -72,23 +66,13 @@ class DatabaseController {
     }
 
     /**
-     * 全ページを非表示にする
-     * @description 他のページコンテナを非表示
+     * 全ページを非表示にする（非推奨 - main-content統一により不要）
+     * @description Router.jsが main-content の管理を行うため、このメソッドは使用しない
+     * @deprecated この方法は使用せず、Router.js による統一管理を採用
      */
     hideAllPages() {
-        const pageContainers = [
-            'dashboard',
-            'assetForm', 
-            'csvImport',
-            'databaseContainer'
-        ];
-
-        pageContainers.forEach(containerId => {
-            const container = document.getElementById(containerId);
-            if (container) {
-                container.style.display = 'none';
-            }
-        });
+        // Router.js による統一管理のため、このメソッドは使用しない
+        console.log('ℹ️ hideAllPages() is deprecated - Router.js handles view management');
     }
 
     /**
@@ -399,7 +383,7 @@ class DatabaseController {
 }
 
 // ES6モジュールエクスポート（Router.jsでの import { DatabaseController } 用）
-export { DatabaseController };
+// ES6モジュールとしてのexportは行わない（ブラウザ直読みとの両立のため）
 
 // グローバルエクスポート（従来の互換性保持）
 if (typeof module !== 'undefined' && module.exports) {
