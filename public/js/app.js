@@ -24,6 +24,15 @@ class App {
             // デバッグ情報更新
             this.updateDebugInfo('Router初期化中...');
             
+            // DataStoreManagerのグローバルインスタンスを作成
+            console.log('🗄️ Initializing DataStoreManager...');
+            if (typeof DataStoreManager !== 'undefined') {
+                window.dataStoreManager = new DataStoreManager();
+                console.log('✅ DataStoreManager initialized globally');
+            } else {
+                console.warn('⚠️ DataStoreManager not found');
+            }
+            
             // Router初期化（自動的にDashboardControllerとAssetFormControllerを管理）
             console.log('🧭 Initializing Router...');
             this.router = new Router();

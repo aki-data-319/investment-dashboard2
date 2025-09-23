@@ -25,9 +25,9 @@ class TransactionTable {
                     <h3>📈 取引履歴管理</h3>
                     <p class="section-description">全ての投資取引を統合表示・検索・フィルタリング</p>
                 </div>
-                ${this.renderControls()}
                 ${this.renderStats()}
                 ${this.renderFilters()}
+                ${this.renderControls()}
                 ${this.renderTable()}
             </div>
         `;
@@ -55,6 +55,9 @@ class TransactionTable {
                     </button>
                     <button onclick="transactionTable.refreshData()" class="btn-refresh">
                         🔄 更新
+                    </button>
+                    <button onclick="transactionTable.clearAllDatabase()" class="btn-clear-db">
+                        🗑️ データクリア
                     </button>
                 </div>
             </div>
@@ -136,9 +139,7 @@ class TransactionTable {
                         </select>
                     </div>
                     <div class="filter-actions">
-                        <button onclick="transactionTable.clearFilters()" class="btn-secondary">
-                            🔄 クリア
-                        </button>
+                        <!-- フィルタークリア機能を削除 - わかりにくさを避けるため -->
                     </div>
                 </div>
             </div>
@@ -491,6 +492,174 @@ class TransactionTable {
             setTimeout(() => {
                 notification.remove();
             }, 3000);
+        }
+    }
+
+    /**
+     * データベース全削除機能
+     * @description 3段階確認プロセスによる安全なデータ削除
+     */
+    clearAllDatabase() {
+        console.log('🗑️ データベースクリア開始');
+        
+        // DataStoreManagerインスタンスの取得
+        // 注入されたサービス経由でアクセス（CSVエクスポートと同じパターン）
+        const dataManager = this.service.dataStoreManager;
+        
+        // デバッグ情報出力
+        console.log('🔍 デバッグ情報:');
+        console.log('this.service:', this.service);
+        console.log('this.service.dataStoreManager:', this.service.dataStoreManager);
+        console.log('dataManager:', dataManager);
+        console.log('dataManager constructor:', dataManager?.constructor?.name);
+        
+        if (!dataManager) {
+            console.error('❌ DataStoreManagerが見つかりません');
+            this.showMessage('❌ データ管理システムが見つかりません', 'error');
+            return;
+        }
+        
+        // 第1段階: 基本警告
+        const confirmed1 = confirm(`⚠️ データベース全削除の警告\n\nこの操作により、保存されている全ての投資データが完全に削除されます。\n\n【削除されるデータ】\n• 投資信託情報\n• 個別株情報\n• 仮想通貨情報\n• 取引履歴\n• 編集履歴\n\n⚠️ 一度削除されたデータは復元できません\n\n続行しますか？`);
+        
+        if (!confirmed1) {
+            console.log('❌ データベースクリア中止 - 第1段階');
+            return;
+        }
+        
+        // 第2段階: データプレビュー
+        const stats = this.getDatabaseStats(dataManager);
+        const confirmed2 = confirm(`📊 削除対象データの確認\n\n現在保存されているデータ:\n投資信託: ${stats.mutualFunds}件\n個別株: ${stats.stocks}件\n仮想通貨: ${stats.cryptos}件\n取引履歴: ${stats.total}件\n\n⚠️ これらのデータが全て削除されます\n\n削除を実行しますか？`);
+        
+        if (!confirmed2) {
+            console.log('❌ データベースクリア中止 - 第2段階');
+            return;
+        }
+        
+        // 最終確認（簡略化）
+        const finalConfirmed = confirm(`🔴 最終確認 - データ完全削除\n\n本当にすべてのデータを削除しますか？\nこの操作は取り消しできません。`);
+        
+        if (!finalConfirmed) {
+            console.log('❌ データベースクリア中止 - 最終確認');
+            this.showMessage('データクリアがキャンセルされました', 'info');
+            return;
+        }
+        
+        // データ削除実行
+        try {
+            console.log('🔄 clearAllData() 実行中...');
+            console.log('dataManager:', dataManager);
+            console.log('clearAllData method:', typeof dataManager.clearAllData);
+            
+            const success = dataManager.clearAllData();
+            
+            console.log('✅ clearAllData() 実行結果:', success);
+            
+            if (success) {
+                this.showMessage('✅ 全データの削除が完了しました', 'success');
+                console.log('✅ データベースクリア完了');
+                
+                // スムーズな更新（リフレッシュなし）
+                console.log('🔄 スムーズ更新開始...');
+                
+                // 1. サービスのキャッシュをクリア
+                this.service.clearCache();
+                
+                // 2. テーブルを再描画（空状態になる）
+                this.updateTableWithAnimation();
+                
+                // 3. 他のタブも更新（もしDatabaseControllerがアクセス可能なら）
+                this.refreshOtherTabs();
+                
+                console.log('✅ スムーズ更新完了');
+            } else {
+                this.showMessage('❌ データ削除に失敗しました', 'error');
+                console.error('❌ データベースクリア失敗');
+            }
+        } catch (error) {
+            console.error('❌ データベースクリアエラー:', error);
+            console.error('Error details:', error);
+            this.showMessage('❌ データ削除中にエラーが発生しました', 'error');
+        }
+    }
+
+    /**
+     * データベース統計情報取得
+     * @description データプレビュー表示用の統計情報を取得
+     * @param {DataStoreManager} dataManager - データマネージャー
+     * @returns {Object} 統計情報
+     * @example
+     * const stats = transactionTable.getDatabaseStats(dataManager);
+     * console.log(`投資信託: ${stats.mutualFunds}件`);
+     */
+    getDatabaseStats(dataManager) {
+        try {
+            // TransactionDatabaseService経由でデータを取得（表示と同じデータソース）
+            const allTransactions = this.service.getAllTransactions();
+            
+            // 種別ごとに分類
+            const mutualFunds = allTransactions.filter(t => t.type === 'mutualFund');
+            const stocks = allTransactions.filter(t => t.type === 'stock');
+            const cryptos = allTransactions.filter(t => t.type === 'crypto');
+            
+            return {
+                mutualFunds: mutualFunds.length,
+                stocks: stocks.length,
+                cryptos: cryptos.length,
+                total: allTransactions.length
+            };
+        } catch (error) {
+            console.error('統計情報取得エラー:', error);
+            return {
+                mutualFunds: 0,
+                stocks: 0,
+                cryptos: 0,
+                total: 0
+            };
+        }
+    }
+
+    /**
+     * アニメーション付きでテーブルを更新
+     * @description データクリア後のスムーズな画面遷移
+     */
+    updateTableWithAnimation() {
+        const container = document.querySelector('.transaction-database-container');
+        if (container) {
+            // フェードアウト
+            container.style.opacity = '0.3';
+            container.style.transition = 'opacity 0.3s ease';
+            
+            // 少し待ってから更新
+            setTimeout(() => {
+                this.updateTable();
+                
+                // フェードイン
+                container.style.opacity = '1';
+                console.log('✅ アニメーション付き更新完了');
+            }, 150);
+        } else {
+            // フォールバック：通常更新
+            this.updateTable();
+        }
+    }
+
+    /**
+     * 他のタブも更新する
+     * @description データクリア後に銘柄情報タブなども空状態にする
+     */
+    refreshOtherTabs() {
+        try {
+            // DatabaseControllerにアクセスして他のタブも更新
+            if (window.databaseController && typeof window.databaseController.refreshAllTabs === 'function') {
+                window.databaseController.refreshAllTabs();
+                console.log('✅ 他のタブも更新しました');
+            } else {
+                console.log('ℹ️ DatabaseController経由での更新はスキップ');
+            }
+        } catch (error) {
+            console.warn('⚠️ 他のタブ更新でエラー:', error);
+            // エラーが発生してもメイン処理は継続
         }
     }
 }

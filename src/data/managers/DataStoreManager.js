@@ -29,7 +29,8 @@ export class DataStoreManager {
             stocks: 'investment_stocks',                // 個別株データ
             cryptoAssets: 'investment_crypto_assets',   // 仮想通貨データ
             assetHistory: 'investment_asset_history',   // 資産履歴データ
-            simpleHistory: 'investment_simple_history'  // 簡単な変更履歴データ
+            simpleHistory: 'investment_simple_history', // 簡単な変更履歴データ
+            transactions: 'investment-transactions'     // 統合取引データ
         };
         
         // Repositoryから渡されるアダプターと設定（任意）

@@ -29,26 +29,41 @@ class CsvImportController {
     this.view.onFileSelected(async (file) => {
       this.currentFile = file;
       this.lastPreview = null;
-      this.view.showPreview({ transactions: [], warnings: [], format: 'UNKNOWN' });
-      this.view.hideLoading('ファイルを選択しました');
+      
+      // スムーズUX: ファイル選択と同時に自動プレビューを実行
+      console.log('📁 ファイル選択完了、自動プレビュー開始:', file.name);
+      
+      try {
+        // まず空のプレビューを表示（即座にフィードバック）
+        this.view.showPreview({ transactions: [], warnings: [], format: 'UNKNOWN' });
+        
+        // ローディング表示してプレビュー解析を実行
+        this.view.showLoading('プレビュー解析中...');
+        
+        // 少し待ってからプレビュー実行（スムーズな遷移のため）
+        setTimeout(async () => {
+          try {
+            const preview = await this.service.parseAndPreview(this.currentFile);
+            this.lastPreview = preview;
+            
+            // フェードアニメーション付きでプレビュー表示
+            this.updatePreviewWithAnimation(preview);
+            this.view.hideLoading('プレビュー完了');
+            
+            console.log('✅ 自動プレビュー完了:', preview.transactions.length, '件');
+          } catch (error) {
+            console.error('❌ 自動プレビューエラー:', error?.message || error);
+            this.view.hideLoading('解析に失敗しました');
+            this.view.showPreview({ transactions: [], warnings: [`解析エラー: ${error?.message || '不明なエラー'}`], format: 'ERROR' });
+          }
+        }, 100);
+        
+      } catch (error) {
+        console.error('❌ ファイル選択処理エラー:', error);
+        this.view.hideLoading('ファイル処理に失敗しました');
+      }
     });
 
-    this.view.onParse(async () => {
-      if (!this.currentFile) {
-        this.view.hideLoading('CSVファイルを選択してください');
-        return;
-      }
-      try {
-        this.view.showLoading('プレビュー解析中...');
-        const preview = await this.service.parseAndPreview(this.currentFile);
-        this.lastPreview = preview;
-        this.view.showPreview(preview);
-        this.view.hideLoading('プレビュー完了');
-      } catch (e) {
-        console.error('[CsvImportController.js] onParse エラー:', e?.message || e);
-        this.view.hideLoading('解析に失敗しました');
-      }
-    });
 
     this.view.onImport(async (options) => {
       if (!this.currentFile) {
@@ -76,6 +91,36 @@ class CsvImportController {
         this.view.hideLoading('インポートに失敗しました');
       }
     });
+  }
+
+  /**
+   * アニメーション付きプレビュー更新
+   * @description データクリア機能と同じスムーズUXでプレビューを更新
+   * @param {Object} preview - プレビューデータ
+   */
+  updatePreviewWithAnimation(preview) {
+    // プレビューコンテナを取得
+    const previewContainer = document.querySelector('.csv-preview-container, .preview-container');
+    
+    if (previewContainer) {
+      // フェードアウト
+      previewContainer.style.opacity = '0.3';
+      previewContainer.style.transition = 'opacity 0.3s ease';
+      
+      // 少し待ってからプレビュー更新
+      setTimeout(() => {
+        this.view.showPreview(preview);
+        
+        // フェードイン
+        setTimeout(() => {
+          previewContainer.style.opacity = '1';
+          console.log('✅ プレビューアニメーション完了');
+        }, 50);
+      }, 150);
+    } else {
+      // フォールバック：通常更新
+      this.view.showPreview(preview);
+    }
   }
 
   destroy() {

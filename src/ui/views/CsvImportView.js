@@ -7,7 +7,6 @@ export class CsvImportView {
   constructor() {
     this.container = document.getElementById('mainContent');
     this.callbacks = {
-      onParse: null,
       onImport: null,
       onFileSelected: null
     };
@@ -32,7 +31,6 @@ export class CsvImportView {
   /**
    * コールバック登録
    */
-  onParse(handler) { this.callbacks.onParse = handler; }
   onImport(handler) { this.callbacks.onImport = handler; }
   onFileSelected(handler) { this.callbacks.onFileSelected = handler; }
 
@@ -122,7 +120,6 @@ export class CsvImportView {
     if (this.statusArea) {
       this.statusArea.innerHTML = `<div class="text-sm">⏳ ${message}</div>`;
     }
-    if (this.parseBtn) this.parseBtn.disabled = true;
     if (this.importBtn) this.importBtn.disabled = true;
   }
 
@@ -130,7 +127,6 @@ export class CsvImportView {
     if (this.statusArea) {
       this.statusArea.innerHTML = message ? `<div class="text-sm">${message}</div>` : '';
     }
-    if (this.parseBtn) this.parseBtn.disabled = false;
     if (this.importBtn) this.importBtn.disabled = false;
   }
 
@@ -140,7 +136,6 @@ export class CsvImportView {
   #bindDomRefs() {
     this.dropZone = this.container.querySelector('#dropZone');
     this.fileInput = this.container.querySelector('#csvFile');
-    this.parseBtn = this.container.querySelector('#parseBtn');
     this.importBtn = this.container.querySelector('#importBtn');
     this.previewArea = this.container.querySelector('#previewArea');
     this.resultArea = this.container.querySelector('#resultArea');
@@ -169,12 +164,6 @@ export class CsvImportView {
       this.fileInput.addEventListener('change', (e) => {
         const file = e.target.files?.[0];
         if (file && this.callbacks.onFileSelected) this.callbacks.onFileSelected(file);
-      });
-    }
-
-    if (this.parseBtn) {
-      this.parseBtn.addEventListener('click', () => {
-        if (this.callbacks.onParse) this.callbacks.onParse();
       });
     }
 
@@ -216,10 +205,6 @@ export class CsvImportView {
           </div>
 
           <div class="mt-4 flex gap-2">
-            <button id="parseBtn" class="btn btn-secondary rounded-md px-3 py-2 flex items-center gap-2">
-              <i data-lucide="eye" class="h-4 w-4"></i>
-              プレビュー
-            </button>
             <button id="importBtn" class="btn btn-primary rounded-md px-3 py-2 flex items-center gap-2">
               <i data-lucide="check-circle" class="h-4 w-4"></i>
               インポート
